@@ -471,7 +471,7 @@
                 if (cards[index]) cards[index].classList.add('playing');
                 isPlaying = true;
 
-                const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&q=${encodeURIComponent(syllable)}&tl=ru`;
+                const ttsUrl = `https://translate.googleapis.com/translate_tts?ie=UTF-8&client=gtx&q=...&tl=ru`;
 
                 const audio = new Audio(ttsUrl);
                 audio.volume = 1;
