@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>200 русских слогов — Google TTS</title>
+    <style>
+        :root {
+            --bg: #0d1117;
+            --bg-card: #161b22;
+            --bg-card-hover: #1c2333;
+            --border: #30363d;
+            --text: #e6edf3;
+            --text-secondary: #8b949e;
+            --accent: #2dd4bf;
+            --accent-glow: rgba(45, 212, 191, 0.25);
+            --danger: #f85149;
+            --danger-glow: rgba(248, 81, 73, 0.2);
+            --radius: 10px;
+            --transition: 0.2s ease;
+            --font: -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font);
+            min-height: 100vh;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            padding: 32px 20px 20px;
+            text-align: center;
+            background: linear-gradient(180deg, rgba(45, 212, 191, 0.06) 0%, transparent 100%);
+            border-bottom: 1px solid var(--border);
+        }
+        .header h1 {
+            font-size: clamp(1.6rem, 4vw, 2.4rem);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #e6edf3 60%, #2dd4bf 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+        .header p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .header .info-badge {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 6px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--accent);
+        }
+        .header .info-badge span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #3fb950;
+            border-radius: 50%;
+            margin-right: 6px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.2); }
+        }
+
+        .status-bar {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 16px 20px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--border);
+            transition: background 0.3s;
+        }
+        .status-dot.ready {
+            background: #3fb950;
+            box-shadow: 0 0 8px rgba(63, 185, 80, 0.5);
+        }
+        .status-dot.error {
+            background: var(--danger);
+            box-shadow: 0 0 8px var(--danger-glow);
+        }
+        .status-dot.playing {
+            background: var(--accent);
+            animation: pulse 0.6s infinite;
+        }
+
+        .stop-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: var(--transition);
+            font-family: var(--font);
+        }
+        .stop-btn:hover {
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+        .stop-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .grid-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px 20px 40px;
+            flex: 1;
+        }
+        .syllable-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+            gap: 6px;
+        }
+
+        .syllable-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 4px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 1.15rem;
+            font-weight: 500;
+            color: var(--text);
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            transition: background var(--transition),
+                border-color var(--transition),
+                box-shadow var(--transition),
+                transform var(--transition);
+            position: relative;
+            font-family: var(--font);
+        }
+        .syllable-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--accent);
+            box-shadow: 0 0 10px var(--accent-glow);
+            transform: translateY(-1px);
+        }
+        .syllable-card:active {
+            transform: scale(0.96);
+            box-shadow: 0 0 6px var(--accent-glow);
+        }
+        .syllable-card .rank {
+            position: absolute;
+            top: 2px;
+            right: 5px;
+            font-size: 0.55rem;
+            color: var(--text-secondary);
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        .syllable-card.playing {
+            border-color: var(--accent);
+            background: var(--accent-glow);
+            box-shadow: 0 0 16px var(--accent-glow);
+            animation: playingGlow 0.7s infinite alternate;
+        }
+        .syllable-card.error {
+            border-color: var(--danger);
+            box-shadow: 0 0 10px var(--danger-glow);
+            animation: shake 0.4s;
+        }
+
+        @keyframes playingGlow {
+            0% { box-shadow: 0 0 8px var(--accent-glow); }
+            100% { box-shadow: 0 0 20px var(--accent-glow); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-4px); }
+            40% { transform: translateX(4px); }
+            60% { transform: translateX(-3px); }
+            80% { transform: translateX(3px); }
+        }
+
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            pointer-events: none;
+        }
+        .toast {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 20px;
+            font-size: 0.85rem;
+            color: var(--text);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            animation: toastIn 0.3s ease, toastOut 0.3s ease 2.7s forwards;
+            max-width: 90vw;
+            text-align: center;
+            pointer-events: auto;
+        }
+        .toast.error {
+            border-color: var(--danger);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 12px var(--danger-glow);
+        }
+        .toast.success {
+            border-color: #3fb950;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 12px rgba(63, 185, 80, 0.3);
+        }
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes toastOut {
+            from { opacity: 1; }
+            to { opacity: 0; transform: translateY(10px); }
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            border-top: 1px solid var(--border);
+        }
+        .footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            .syllable-grid {
+                grid-template-columns: repeat(auto-fill, minmax(58px, 1fr));
+                gap: 4px;
+            }
+            .syllable-card {
+                font-size: 1rem;
+                padding: 10px 2px;
+                border-radius: 6px;
+            }
+            .syllable-card .rank {
+                font-size: 0.5rem;
+                top: 1px;
+                right: 3px;
+            }
+            .header {
+                padding: 24px 16px 16px;
+            }
+            .grid-container {
+                padding: 12px 12px 32px;
+            }
+        }
+        @media (max-width: 380px) {
+            .syllable-grid {
+                grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
+                gap: 3px;
+            }
+            .syllable-card {
+                font-size: 0.9rem;
+                padding: 8px 2px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <h1>Слоги</h1>
+        <p>Жми, слушай, повторяй.</p>
+        <div class="info-badge">
+            <span></span>        </div>
+    </header>
+
+    <div class="status-bar">
+        <div class="status-indicator">
+            <span class="status-dot ready" id="statusDot"></span>
+            <span id="statusText">Готов к работе</span>
+        </div>
+        <button class="stop-btn" id="stopBtn" disabled title="Остановить воспроизведение">⏹ Стоп</button>
+    </div>
+
+    <main class="grid-container">
+        <div class="syllable-grid" id="syllableGrid"></div>
+    </main>
+
+    <footer class="footer">
+        <p>Произношение через Google Translate TTS · Работает во всех браузерах</p>
+    </footer>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        (function() {
+            // ============ 200 СЛОГОВ (от частотных к менее частотным) ============
+            const syllables = [
+                'на', 'не', 'то', 'ра', 'ка', 'ро', 'та', 'ре', 'ни', 'но',
+                'ли', 'ко', 'ла', 'ма', 'ти', 'ми', 'ва', 'да', 'за', 'са',
+                'те', 'ле', 'го', 'се', 'ве', 'ри', 'ло', 'мо', 'ви', 'де',
+                'во', 'со', 'би', 'по', 'бе', 'до', 'ме', 'си', 'ди', 'зи',
+                'бо', 'вы', 'че', 'чи', 'же', 'жи', 'ша', 'ше', 'ши', 'пи',
+                'га', 'ба', 'пе', 'па', 'ге', 'ду', 'ру', 'ку', 'му', 'су',
+                'лу', 'ну', 'ту', 'бу', 'пу', 'гу', 'зу', 'ву', 'фу', 'ху',
+                'цу', 'ня', 'тя', 'ря', 'ля', 'мя', 'ся', 'вя', 'дя', 'зя',
+                'бя', 'пя', 'гя', 'фя', 'хя', 'нё', 'тё', 'рё', 'лё', 'мё',
+                'сё', 'вё', 'дё', 'зё', 'бё', 'пё', 'гё', 'фё', 'хё', 'ню',
+                'тю', 'рю', 'лю', 'мю', 'сю', 'вю', 'дю', 'зю', 'бю', 'пю',
+                'гю', 'фю', 'хю', 'ны', 'ты', 'ры', 'лы', 'мы', 'сы', 'вы',
+                'ды', 'зы', 'бы', 'пы', 'гы', 'фы', 'хы', 'цы', 'нэ', 'тэ',
+                'рэ', 'лэ', 'мэ', 'сэ', 'вэ', 'дэ', 'зэ', 'бэ', 'пэ', 'гэ',
+                'фэ', 'хэ', 'ча', 'чо', 'чу', 'чё', 'чю', 'жа', 'жо', 'жу',
+                'жё', 'жю', 'ща', 'що', 'щу', 'щё', 'ще', 'щи', 'а', 'о',
+                'у', 'э', 'и', 'ы', 'е', 'я', 'ё', 'ю', 'ан', 'он',
+                'ин', 'ун', 'ен', 'ар', 'ор', 'ир', 'ур', 'ер', 'ал', 'ол',
+                'ил', 'ул', 'ел', 'ам', 'ом', 'им', 'ум', 'ем', 'ас', 'ос',
+                'ис', 'ус', 'ес', 'ак', 'ок', 'ик', 'ук', 'ек', 'ат', 'от'
+            ];
+
+            const grid = document.getElementById('syllableGrid');
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+            const stopBtn = document.getElementById('stopBtn');
+            const toastContainer = document.getElementById('toastContainer');
+
+            let currentAudio = null;
+            let activeCardIndex = null;
+            let isPlaying = false;
+
+            function renderGrid() {
+                grid.innerHTML = '';
+                syllables.forEach((syllable, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'syllable-card';
+                    card.dataset.index = index;
+                    card.dataset.syllable = syllable;
+                    card.title = `Слог «${syllable}» — ранг ${index + 1}`;
+                    card.setAttribute('role', 'button');
+                    card.setAttribute('tabindex', '0');
+                    card.setAttribute('aria-label', `Слог ${syllable}, ранг ${index + 1}`);
+
+                    const textSpan = document.createElement('span');
+                    textSpan.textContent = syllable;
+                    card.appendChild(textSpan);
+
+                    const rankSpan = document.createElement('span');
+                    rankSpan.className = 'rank';
+                    rankSpan.textContent = index + 1;
+                    card.appendChild(rankSpan);
+
+                    card.addEventListener('click', () => handleSyllableClick(index));
+                    card.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            handleSyllableClick(index);
+                        }
+                    });
+
+                    grid.appendChild(card);
+                });
+            }
+
+            function updateStatus(state, message) {
+                statusDot.className = 'status-dot';
+                if (state === 'ready') statusDot.classList.add('ready');
+                else if (state === 'error') statusDot.classList.add('error');
+                else if (state === 'playing') statusDot.classList.add('playing');
+                statusText.textContent = message;
+            }
+
+            function showToast(message, type = 'info') {
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+                if (type === 'error') toast.classList.add('error');
+                if (type === 'success') toast.classList.add('success');
+                toast.textContent = message;
+                toastContainer.appendChild(toast);
+                setTimeout(() => {
+                    if (toast.parentNode) toast.remove();
+                }, 3200);
+            }
+
+            function clearCardStates() {
+                document.querySelectorAll('.syllable-card').forEach(card => {
+                    card.classList.remove('playing', 'error');
+                });
+            }
+
+            function stopAudio() {
+                if (currentAudio) {
+                    currentAudio.pause();
+                    currentAudio.src = '';
+                    currentAudio = null;
+                }
+                isPlaying = false;
+                activeCardIndex = null;
+                clearCardStates();
+                stopBtn.disabled = true;
+                updateStatus('ready', 'Готов к работе');
+            }
+
+            function handleSyllableClick(index) {
+                const syllable = syllables[index];
+
+                // Останавливаем предыдущее воспроизведение
+                stopAudio();
+
+                // Отмечаем карточку как играющую
+                activeCardIndex = index;
+                clearCardStates();
+                const cards = document.querySelectorAll('.syllable-card');
+                if (cards[index]) cards[index].classList.add('playing');
+                
+                isPlaying = true;
+                stopBtn.disabled = false;
+                updateStatus('playing', `Произношу «${syllable}»`);
+
+                // Создаём аудио с Google Translate TTS
+                const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(syllable)}&tl=ru&client=tw-ob`;
+                
+                currentAudio = new Audio(ttsUrl);
+                currentAudio.volume = 1;
+                currentAudio.preload = 'auto';
+
+                currentAudio.addEventListener('loadeddata', () => {
+                    currentAudio.play().catch(err => {
+                        console.error('Ошибка воспроизведения:', err);
+                        stopAudio();
+                        if (cards[index]) {
+                            cards[index].classList.add('error');
+                            setTimeout(() => cards[index].classList.remove('error'), 1000);
+                        }
+                        showToast('Ошибка воспроизведения', 'error');
+                    });
+                });
+
+                currentAudio.addEventListener('ended', () => {
+                    stopAudio();
+                });
+
+                currentAudio.addEventListener('error', (e) => {
+                    console.error('Ошибка загрузки аудио:', e);
+                    stopAudio();
+                    if (cards[index]) {
+                        cards[index].classList.add('error');
+                        setTimeout(() => cards[index].classList.remove('error'), 1000);
+                    }
+                    showToast('Не удалось загрузить аудио', 'error');
+                });
+
+                // Начинаем загрузку
+                currentAudio.load();
+            }
+
+            stopBtn.addEventListener('click', stopAudio);
+
+            // Инициализация
+            renderGrid();
+            updateStatus('ready', 'Готов к работе');
+            
+            console.log(`🔤 Загружено ${syllables.length} русских слогов`);
+            console.log('ℹ️  Используется Google Translate TTS');
+            console.log('🌐 Работает во всех современных браузерах');
+        })();
+    </script>
+</body>
+</html>
