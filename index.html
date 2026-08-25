@@ -361,7 +361,7 @@
                 if (card) {
                     card.classList.toggle('learned', learnedSet.has(index));
                 }
-                showToast(learnedSet.has(index) ? '✓ Отмечено' : 'Снято', 'success');
+                showToast(learnedSet.has(index) ? '✓' : '(:', 'success');
             }
 
             function showToast(message, type = 'info') {
