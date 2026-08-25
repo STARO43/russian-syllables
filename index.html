@@ -4,27 +4,43 @@
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
     <title>Грамотиньо</title>
     <style>
         :root {
-            --bg: #0d1117;
-            --bg-card: #161b22;
-            --bg-card-hover: #1f2937;
-            --border: #30363d;
+            --bg: #0a0e17;
+            --bg-card: #111827;
+            --bg-card-hover: #1a2433;
+            --border: #2a3443;
             --text: #e6edf3;
-            --text-secondary: #8b949e;
-            --accent: #2dd4bf;
-            --accent-glow: rgba(45, 212, 191, 0.25);
+            --text-secondary: #8b9bb0;
+            --accent: #4da3ff;
+            --accent-glow: rgba(77, 163, 255, 0.25);
             --learned: #3fb950;
             --learned-bg: rgba(63, 185, 80, 0.2);
             --danger: #f85149;
             --danger-glow: rgba(248, 81, 73, 0.2);
             --radius: 12px;
             --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            --font: -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+            --font: 'PT Serif', serif;
+        }
+
+        /* Светлая тема */
+        body.light-mode {
+            --bg: #f5f7fa;
+            --bg-card: #ffffff;
+            --bg-card-hover: #eef1f5;
+            --border: #d1d9e2;
+            --text: #1a1f2e;
+            --text-secondary: #4b5a6b;
+            --accent: #1d7be0;
+            --accent-glow: rgba(29, 123, 224, 0.15);
+            --learned: #2e9e4f;
+            --learned-bg: rgba(46, 158, 79, 0.15);
+            --danger: #d9382e;
+            --danger-glow: rgba(217, 56, 46, 0.15);
         }
 
         * {
@@ -36,27 +52,55 @@
         body {
             background: var(--bg);
             color: var(--text);
-             font-family: "PT Serif", serif;
+            font-family: var(--font);
             min-height: 100vh;
             line-height: 1.4;
             -webkit-font-smoothing: antialiased;
             display: flex;
             flex-direction: column;
-            background-image: radial-gradient(circle at 20% 20%, rgba(45, 212, 191, 0.03) 0%, transparent 50%),
-                              radial-gradient(circle at 80% 80%, rgba(45, 212, 191, 0.03) 0%, transparent 50%);
+            transition: background 0.3s, color 0.3s;
+            background-image: radial-gradient(circle at 20% 20%, rgba(77, 163, 255, 0.03) 0%, transparent 50%),
+                              radial-gradient(circle at 80% 80%, rgba(77, 163, 255, 0.03) 0%, transparent 50%);
         }
 
         .header {
             padding: 32px 20px 16px;
             text-align: center;
-            background: linear-gradient(180deg, rgba(45, 212, 191, 0.06) 0%, transparent 100%);
+            background: linear-gradient(180deg, rgba(77, 163, 255, 0.06) 0%, transparent 100%);
             border-bottom: 1px solid var(--border);
+            position: relative;
         }
+        .theme-toggle {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+        }
+        .theme-toggle button {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        .theme-toggle button:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
         .header h1 {
             font-size: clamp(2rem, 5vw, 3rem);
-            font-weight: 800;
+            font-weight: 700;
             letter-spacing: -0.02em;
-            background: linear-gradient(135deg, #e6edf3 60%, #2dd4bf 100%);
+            background: linear-gradient(135deg, var(--text) 60%, var(--accent) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -69,8 +113,8 @@
         }
 
         .grid-container {
-            max-width: 900px;               /* было 1200px – сузили */
-            margin: 0 auto;                 /* центрируем */
+            max-width: 900px;
+            margin: 0 auto;
             padding: 20px 20px 40px;
             flex: 1;
             width: 100%;
@@ -96,7 +140,8 @@
             transition: background var(--transition),
                 border-color var(--transition),
                 box-shadow var(--transition),
-                transform var(--transition);
+                transform var(--transition),
+                color 0.3s;
             position: relative;
             font-family: var(--font);
             letter-spacing: 0.05em;
@@ -253,6 +298,9 @@
 <body>
 
     <header class="header">
+        <div class="theme-toggle">
+            <button id="themeToggle" title="Переключить тему">🌓</button>
+        </div>
         <h1>Грамотиньо</h1>
         <p>Жми, слушай, запоминай</p>
     </header>
@@ -269,10 +317,39 @@
 
     <script>
         (function() {
+            // Удалены слоги: "ЁТ", "ИЦ", "ГЁ", "ВЁ", "БЁ", "ИГ"
             const rawItems = [
-                'ЁЖ', 'ёлка', 'ЁН', 'ЁТ', 'АБ', 'АВ', 'АГ', 'АД', 'АЖ', 'АЗ', 'АК', 'АЛ', 'Алла', 'АМ', 'АН', 'Анна', 'АП', 'арка', 'арфа', 'АС', 'АТ', 'АХ', 'АЧ', 'АШ', 'БЁ', 'БА', 'БАК', 'БАЯН', 'БЕ', 'БИ', 'БО', 'БОК', 'БОР', 'Боря', 'БЫ', 'БЫК', 'БЭ', 'БЮ', 'БЯ', 'ВЁ', 'ВА', 'Валя', 'ВЕ', 'ВЕЕР', 'ВИ', 'Витя', 'Вова', 'ВОЗ', 'ВОЛ', 'ВОЛК', 'ВУ', 'ВЫ', 'ВЭ', 'ВЮ', 'ГЁ', 'ГА', 'ГАЗ', 'Галя', 'ГЕ', 'Гена', 'ГИ', 'ГО', 'ГОД', 'ГЫ', 'ГЭ', 'ДА', 'ДИ', 'ДОМ', 'ДУ', 'ДУБ', 'ДУШ', 'ДЫ', 'ДЫМ', 'ДЭ', 'ДЮ', 'ДЯ', 'ЕГ', 'ЕД', 'ЕЖ', 'ЕЛ', 'ЕМ', 'ЕН', 'ЕР', 'ЕС', 'если', 'ЕТ', 'ЕФ', 'ЕХ', 'ЕЦ', 'ЕЧ', 'ЕШ', 'ЖА', 'Женя', 'ЖИ', 'ЖО', 'ЖУ', 'ЖУК', 'ЖЭ', 'ЗА', 'ЗИ', 'Зина', 'ЗО', 'ЗУ', 'ЗЫ', 'ЗЭ', 'ЗЮ', 'ЗЯ', 'ИБ', 'ИВ', 'ИГ', 'игра', 'ИЖ', 'ИК', 'икра', 'ИЛ', 'ИМ', 'ИН', 'ИР', 'ИС', 'ИТ', 'ИФ', 'ИХ', 'ИЧ', 'ИШ', 'ЙОД', 'КА', 'Катя', 'КЕ', 'КИ', 'КИТ', 'КОЛ', 'Коля', 'КОМ', 'КОТ', 'КОФЕ', 'КРАЙ', 'КРАН', 'КУ', 'КЫ', 'КЭ', 'ЛЁ', 'Лёва', 'Лёша', 'ЛАК', 'ЛЕ', 'ЛЕВ', 'Лена', 'ЛЕС', 'ЛЕЩ', 'ЛИ', 'ЛИФТ', 'ЛО', 'ЛОМ', 'ЛУ', 'ЛЫ', 'ЛЫЖИ', 'ЛЭ', 'ЛЮ', 'Люба', 'Люда', 'ЛЮК', 'ЛЯ', 'МА', 'МАК', 'МЕ', 'МЕЛ', 'МЕХ', 'МЕЧ', 'МИ', 'Миша', 'МО', 'МОХ', 'МУ', 'МУХА', 'МЫ', 'МЫЛО', 'МЫС', 'МЭ', 'МЯ', 'МЯЧ', 'НЁ', 'НА', 'НЕ', 'Нина', 'НО', 'НОЖ', 'НОС', 'НУ', 'НЫ', 'НЭ', 'НЯ', 'ОД', 'одна', 'ОЖ', 'ОКНО', 'ОЛ', 'ОМ', 'ОН', 'ОП', 'ОР', 'ОС', 'ОФ', 'ОХ', 'ОЧ', 'очки', 'ОШ', 'ПА', 'ПАУК', 'ПЕРО', 'Петя', 'ПИ', 'ПУ', 'ПУХ', 'ПЫ', 'ПЭ', 'ПЯ', 'РА', 'РАК', 'РИ', 'РИС', 'РО', 'Рома', 'РОТ', 'РУ', 'РЫ', 'РЫБА', 'РЭ', 'РЮ', 'РЯ', 'СЁ', 'СА', 'Саша', 'СЕ', 'СИ', 'СОК', 'СОМ', 'СОР', 'СТУЛ', 'СУ', 'СУК', 'СУП', 'СЫ', 'СЫР', 'СЭ', 'СЮ', 'СЯ', 'Тёма', 'ТА', 'ТАЗ', 'Таня', 'ТЕ', 'ТИ', 'ТО', 'Толя', 'Тома', 'ТОРТ', 'ТРОС', 'ТУ', 'ТЫ', 'ТЭ', 'ТЮ', 'ТЯ', 'УБ', 'УГ', 'УГОЛ', 'УД', 'УЖ', 'УЛ', 'УМ', 'УН', 'УР', 'урна', 'УС', 'УТ', 'утка', 'утро', 'УФ', 'УХ', 'УХО', 'УЧ', 'УШ', 'ушко', 'ФА', 'ФЕ', 'Федя', 'ФИ', 'ФО', 'ФУ', 'ФЫ', 'ФЭ', 'ХА', 'ХЕ', 'ХО', 'ХУ', 'ХЫ', 'ХЭ', 'ЦА', 'ЦЕ', 'ЦИ', 'ЦО', 'ЦУ', 'ЦЭ', 'ЧА', 'ЧАЙ', 'ЧЕК', 'ЧИ', 'ЧУ', 'ЧЭ', 'ША', 'ШАГ', 'ШЕ', 'ШИ', 'ШОВ', 'ШУ', 'ШЭ', 'ЩИ', 'ЩИТ', 'ЫБ', 'ЫВ', 'ЫК', 'ЫМ', 'ЫН', 'ЫС', 'ЫТ', 'ЫХ', 'ЭБ', 'ЭГ', 'ЭД', 'ЭК', 'ЭЛ', 'ЭМ', 'ЭН', 'ЭП', 'ЭР', 'ЭС', 'ЭТ', 'ЭФ', 'ЭХ', 'ЭЦ', 'юбка', 'ЮГ', 'юнга', 'ЯБ', 'ЯВ', 'ЯГ', 'ЯД', 'ЯК', 'ЯЛ', 'ЯМ', 'ЯН', 'ЯП', 'ЯР', 'ЯС', 'ЯТ', 'ЯХ', 'яхта', 'ЯЦ'
+                'ЁЖ', 'ёлка', 'ЁН', 'АБ', 'АВ', 'АГ', 'АД', 'АЖ', 'АЗ', 'АК', 'АЛ', 'Алла', 'АМ', 'АН', 'Анна', 'АП', 'арка', 'арфа', 'АС', 'АТ', 'АХ', 'АЧ', 'АШ',
+                'БА', 'БАК', 'БАЯН', 'БЕ', 'БИ', 'БО', 'БОК', 'БОР', 'Боря', 'БЫ', 'БЫК', 'БЭ', 'БЮ', 'БЯ',
+                'ВА', 'Валя', 'ВЕ', 'ВЕЕР', 'ВИ', 'Витя', 'Вова', 'ВОЗ', 'ВОЛ', 'ВОЛК', 'ВУ', 'ВЫ', 'ВЭ', 'ВЮ',
+                'ГА', 'ГАЗ', 'Галя', 'ГЕ', 'Гена', 'ГИ', 'ГО', 'ГОД', 'ГЫ', 'ГЭ',
+                'ДА', 'ДИ', 'ДОМ', 'ДУ', 'ДУБ', 'ДУШ', 'ДЫ', 'ДЫМ', 'ДЭ', 'ДЮ', 'ДЯ',
+                'ЕГ', 'ЕД', 'ЕЖ', 'ЕЛ', 'ЕМ', 'ЕН', 'ЕР', 'ЕС', 'если', 'ЕТ', 'ЕФ', 'ЕХ', 'ЕЦ', 'ЕЧ', 'ЕШ',
+                'ЖА', 'Женя', 'ЖИ', 'ЖО', 'ЖУ', 'ЖУК', 'ЖЭ',
+                'ЗА', 'ЗИ', 'Зина', 'ЗО', 'ЗУ', 'ЗЫ', 'ЗЭ', 'ЗЮ', 'ЗЯ',
+                'ИБ', 'ИВ', 'игра', 'ИЖ', 'ИК', 'икра', 'ИЛ', 'ИМ', 'ИН', 'ИР', 'ИС', 'ИТ', 'ИФ', 'ИХ', 'ИЧ', 'ИШ',
+                'ЙОД', 'КА', 'Катя', 'КЕ', 'КИ', 'КИТ', 'КОЛ', 'Коля', 'КОМ', 'КОТ', 'КОФЕ', 'КРАЙ', 'КРАН', 'КУ', 'КЫ', 'КЭ',
+                'ЛЁ', 'Лёва', 'Лёша', 'ЛАК', 'ЛЕ', 'ЛЕВ', 'Лена', 'ЛЕС', 'ЛЕЩ', 'ЛИ', 'ЛИФТ', 'ЛО', 'ЛОМ', 'ЛУ', 'ЛЫ', 'ЛЫЖИ', 'ЛЭ', 'ЛЮ', 'Люба', 'Люда', 'ЛЮК', 'ЛЯ',
+                'МА', 'МАК', 'МЕ', 'МЕЛ', 'МЕХ', 'МЕЧ', 'МИ', 'Миша', 'МО', 'МОХ', 'МУ', 'МУХА', 'МЫ', 'МЫЛО', 'МЫС', 'МЭ', 'МЯ', 'МЯЧ',
+                'НЁ', 'НА', 'НЕ', 'Нина', 'НО', 'НОЖ', 'НОС', 'НУ', 'НЫ', 'НЭ', 'НЯ',
+                'ОД', 'одна', 'ОЖ', 'ОКНО', 'ОЛ', 'ОМ', 'ОН', 'ОП', 'ОР', 'ОС', 'ОФ', 'ОХ', 'ОЧ', 'очки', 'ОШ',
+                'ПА', 'ПАУК', 'ПЕРО', 'Петя', 'ПИ', 'ПУ', 'ПУХ', 'ПЫ', 'ПЭ', 'ПЯ',
+                'РА', 'РАК', 'РИ', 'РИС', 'РО', 'Рома', 'РОТ', 'РУ', 'РЫ', 'РЫБА', 'РЭ', 'РЮ', 'РЯ',
+                'СЁ', 'СА', 'Саша', 'СЕ', 'СИ', 'СОК', 'СОМ', 'СОР', 'СТУЛ', 'СУ', 'СУК', 'СУП', 'СЫ', 'СЫР', 'СЭ', 'СЮ', 'СЯ',
+                'Тёма', 'ТА', 'ТАЗ', 'Таня', 'ТЕ', 'ТИ', 'ТО', 'Толя', 'Тома', 'ТОРТ', 'ТРОС', 'ТУ', 'ТЫ', 'ТЭ', 'ТЮ', 'ТЯ',
+                'УБ', 'УГ', 'УГОЛ', 'УД', 'УЖ', 'УЛ', 'УМ', 'УН', 'УР', 'урна', 'УС', 'УТ', 'утка', 'утро', 'УФ', 'УХ', 'УХО', 'УЧ', 'УШ', 'ушко',
+                'ФА', 'ФЕ', 'Федя', 'ФИ', 'ФО', 'ФУ', 'ФЫ', 'ФЭ',
+                'ХА', 'ХЕ', 'ХО', 'ХУ', 'ХЫ', 'ХЭ',
+                'ЦА', 'ЦЕ', 'ЦИ', 'ЦО', 'ЦУ', 'ЦЭ',
+                'ЧА', 'ЧАЙ', 'ЧЕК', 'ЧИ', 'ЧУ', 'ЧЭ',
+                'ША', 'ШАГ', 'ШЕ', 'ШИ', 'ШОВ', 'ШУ', 'ШЭ',
+                'ЩИ', 'ЩИТ',
+                'ЫБ', 'ЫВ', 'ЫК', 'ЫМ', 'ЫН', 'ЫС', 'ЫТ', 'ЫХ',
+                'ЭБ', 'ЭГ', 'ЭД', 'ЭК', 'ЭЛ', 'ЭМ', 'ЭН', 'ЭП', 'ЭР', 'ЭС', 'ЭТ', 'ЭФ', 'ЭХ', 'ЭЦ',
+                'юбка', 'ЮГ', 'юнга', 'ЯБ', 'ЯВ', 'ЯГ', 'ЯД', 'ЯК', 'ЯЛ', 'ЯМ', 'ЯН', 'ЯП', 'ЯР', 'ЯС', 'ЯТ', 'ЯХ', 'яхта', 'ЯЦ'
             ];
 
+            // Сортировка: по длине, затем по алфавиту
             const syllables = rawItems.sort((a, b) => {
                 const lenDiff = a.length - b.length;
                 if (lenDiff !== 0) return lenDiff;
@@ -281,6 +358,16 @@
 
             const grid = document.getElementById('syllableGrid');
             const toastContainer = document.getElementById('toastContainer');
+            const themeToggle = document.getElementById('themeToggle');
+
+            // Инициализация темы
+            if (localStorage.getItem('theme') === 'light') {
+                document.body.classList.add('light-mode');
+            }
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('light-mode');
+                localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+            });
 
             let currentAudio = null;
             let activeCardIndex = null;
