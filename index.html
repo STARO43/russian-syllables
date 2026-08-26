@@ -1,20 +1,6 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta name="description" content="Грамотиньо — учимся читать слоги.">
-<meta name="keywords" content="слоги, русский язык, обучение, чтение, грамота, TTS, звуки">
-<meta name="author" content="Грамотиньо">
-
-<!-- Open Graph для соцсетей -->
-<meta property="og:title" content="Грамотиньо — учим слоги">
-<meta property="og:description" content="Слоги и слова с озвучкой для чтения.">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://staro43.github.io/">
-
-<!-- Twitter Card -->
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Грамотиньо">
-<meta name="twitter:description" content="Учим слоги и слова с озвучкой.">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -113,7 +99,7 @@
         .header h1 {
             font-size: clamp(2rem, 5vw, 3rem);
             font-weight: 700;
-            letter-spacing: 0.001em;
+            letter-spacing: 0.05em;
             background: linear-gradient(135deg, var(--text) 60%, var(--accent) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -302,11 +288,7 @@
                 padding: 12px 12px 32px;
             }
         }
-        @media (max-width: 400px) {
-            .syllable-grid {
-                grid-template-columns: 1fr;
-            }
-        }
+        /* Убрали блок с max-width:400px, чтобы всегда было по две колонки */
     </style>
 </head>
 <body>
