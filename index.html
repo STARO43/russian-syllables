@@ -128,7 +128,6 @@
             justify-content: center;
             transition: var(--transition);
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            position: relative;
         }
         .controls button:hover {
             border-color: var(--accent);
@@ -140,50 +139,6 @@
             border-color: var(--accent);
             color: var(--accent);
             box-shadow: 0 0 12px var(--accent-glow);
-        }
-
-        /* Тултипы */
-        .controls button::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            bottom: calc(100% + 8px);
-            left: 50%;
-            transform: translateX(-50%) translateY(5px);
-            background: var(--bg-card);
-            color: var(--text);
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            white-space: nowrap;
-            border: 1px solid var(--border);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-            pointer-events: none;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.2s ease, transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.2s;
-            z-index: 10;
-        }
-        .controls button::before {
-            content: '';
-            position: absolute;
-            bottom: calc(100% + 2px);
-            left: 50%;
-            transform: translateX(-50%) translateY(5px);
-            width: 0;
-            height: 0;
-            border-left: 5px solid transparent;
-            border-right: 5px solid transparent;
-            border-top: 5px solid var(--bg-card);
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.2s ease, transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.2s;
-            z-index: 11;
-        }
-        .controls button:hover::after,
-        .controls button:hover::before {
-            opacity: 1;
-            visibility: visible;
-            transform: translateX(-50%) translateY(0);
         }
 
         .grid-container {
@@ -343,7 +298,6 @@
             .learn-dot { width: 12px; height: 12px; bottom: 4px; right: 4px; }
             .controls { gap: 6px; }
             .controls button { width: 38px; height: 38px; font-size: 1.1rem; }
-            .controls button::after { font-size: 0.7rem; padding: 4px 8px; }
         }
     </style>
 </head>
@@ -351,17 +305,18 @@
 
     <header class="header">
         <div class="theme-toggle">
-            <button id="themeToggle" data-tooltip="Тёмно или светло">🌓</button>
+            <button id="themeToggle" title="Тёмно или светло">🌓</button>
         </div>
         <h1>Грамотиньо</h1>
         <p>Жми, слушай, запоминай</p>
     </header>
 
+    <!-- Кнопки-иконки -->
     <div class="controls">
-        <button class="mode-btn active" data-mode="default" data-tooltip="Алфавитно">🅰</button>
-        <button class="mode-btn" data-mode="vowels" data-tooltip="Гласно">🅱</button>
-        <button class="mode-btn" data-mode="random" data-tooltip="Случайно">🎲</button>
-        <button class="mode-btn" id="hideLearnedBtn" data-tooltip="Скрыть отмеченные">✂</button>
+        <button class="mode-btn active" data-mode="default" title="Алфавитно">🅰</button>
+        <button class="mode-btn" data-mode="vowels" title="Гласно">🅱</button>
+        <button class="mode-btn" data-mode="random" title="Случайно">🎲</button>
+        <button class="mode-btn" id="hideLearnedBtn" title="Скрыть отмеченные">✂</button>
     </div>
 
     <main class="grid-container">
@@ -376,7 +331,7 @@
 
     <script>
         (function() {
-            // ============ ЗАХАРДКОЖЕННЫЙ МАССИВ defaultItems (без «ЕЦ») ============
+            // ============ ЗАХАРДКОЖЕННЫЕ МАССИВЫ (без «ЕЦ») ============
             const defaultItems = [
                 'АБ', 'АВ', 'АГ', 'АД', 'АЖ', 'АЗ', 'АК', 'АЛ', 'АМ', 'АН', 'АП', 'АР', 'АС', 'АТ', 'АФ', 'АХ', 'АЦ', 'АЧ', 'АШ',
                 'БА', 'БЕ', 'БИ', 'БО', 'БЫ', 'БЭ', 'БЮ', 'БЯ',
@@ -420,57 +375,30 @@
                 'РОМА', 'САША', 'ТЁМА', 'ТАНЯ', 'ТОЛЯ', 'ТОМА', 'ФЕДЯ', 'ЛЁНЯ'
             ];
 
-            // ============ ФУНКЦИЯ СОРТИРОВКИ "ОТ ГЛАСНЫХ" (только для элементов defaultItems) ============
-            const vowels = ['а', 'е', 'ё', 'и', 'о', 'у', 'ы', 'э', 'ю', 'я'];
-            const names = new Set([
+            const vowelsItems = [
+                'БА', 'ВА', 'ГА', 'ДА', 'ЖА', 'ЗА', 'КА', 'ЛА', 'МА', 'НА', 'ПА', 'РА', 'СА', 'ТА', 'ФА', 'ХА', 'ЦА', 'ЧА', 'ША', 'ЩА',
+                'БЕ', 'ВЕ', 'ГЕ', 'ДЕ', 'ЖЕ', 'ЗЕ', 'КЕ', 'ЛЕ', 'МЕ', 'НЕ', 'ПЕ', 'РЕ', 'СЕ', 'ТЕ', 'ФЕ', 'ХЕ', 'ЦЕ', 'ЧЕ', 'ШЕ', 'ЩЕ',
+                'БЁ', 'ВЁ', 'ГЁ', 'ДЁ', 'ЖЁ', 'ЗЁ', 'КЁ', 'ЛЁ', 'МЁ', 'НЁ', 'ПЁ', 'РЁ', 'СЁ', 'ТЁ', 'ФЁ', 'ХЁ', 'ЦЁ', 'ЧЁ', 'ШЁ', 'ЩЁ',
+                'БИ', 'ВИ', 'ГИ', 'ДИ', 'ЖИ', 'ЗИ', 'КИ', 'ЛИ', 'МИ', 'НИ', 'ПИ', 'РИ', 'СИ', 'ТИ', 'ФИ', 'ХИ', 'ЦИ', 'ЧИ', 'ШИ', 'ЩИ',
+                'БО', 'ВО', 'ГО', 'ДО', 'ЖО', 'ЗО', 'КО', 'ЛО', 'МО', 'НО', 'ПО', 'РО', 'СО', 'ТО', 'ФО', 'ХО', 'ЦО', 'ЧО', 'ШО', 'ЩО',
+                'БУ', 'ВУ', 'ГУ', 'ДУ', 'ЖУ', 'ЗУ', 'КУ', 'ЛУ', 'МУ', 'НУ', 'ПУ', 'РУ', 'СУ', 'ТУ', 'ФУ', 'ХУ', 'ЦУ', 'ЧУ', 'ШУ', 'ЩУ',
+                'БЫ', 'ВЫ', 'ГЫ', 'ДЫ', 'ЖЫ', 'ЗЫ', 'КЫ', 'ЛЫ', 'МЫ', 'НЫ', 'ПЫ', 'РЫ', 'СЫ', 'ТЫ', 'ФЫ', 'ХЫ', 'ЦЫ', 'ЧЫ', 'ШЫ', 'ЩЫ',
+                'БЭ', 'ВЭ', 'ГЭ', 'ДЭ', 'ЖЭ', 'ЗЭ', 'КЭ', 'ЛЭ', 'МЭ', 'НЭ', 'ПЭ', 'РЭ', 'СЭ', 'ТЭ', 'ФЭ', 'ХЭ', 'ЦЭ', 'ЧЭ', 'ШЭ', 'ЩЭ',
+                'БЮ', 'ВЮ', 'ГЮ', 'ДЮ', 'ЖЮ', 'ЗЮ', 'КЮ', 'ЛЮ', 'МЮ', 'НЮ', 'ПЮ', 'РЮ', 'СЮ', 'ТЮ', 'ФЮ', 'ХЮ', 'ЦЮ', 'ЧЮ', 'ШЮ', 'ЩЮ',
+                'БЯ', 'ВЯ', 'ГЯ', 'ДЯ', 'ЖЯ', 'ЗЯ', 'КЯ', 'ЛЯ', 'МЯ', 'НЯ', 'ПЯ', 'РЯ', 'СЯ', 'ТЯ', 'ФЯ', 'ХЯ', 'ЦЯ', 'ЧЯ', 'ШЯ', 'ЩЯ',
                 'АЛЛА', 'АННА', 'БОРЯ', 'ВАЛЯ', 'ВИТЯ', 'ВОВА', 'ГАЛЯ', 'ГЕНА', 'ЖЕНЯ', 'ЗИНА',
                 'КАТЯ', 'КОЛЯ', 'ЛЁВА', 'ЛЁША', 'ЛЕНА', 'ЛЮБА', 'ЛЮДА', 'МИША', 'НИНА', 'ПЕТЯ',
-                'РОМА', 'САША', 'ТЁМА', 'ТАНЯ', 'ТОЛЯ', 'ТОМА', 'ФЕДЯ', 'ЛЁНЯ'
-            ]);
-            const misc = new Set(['ЕСЛИ', 'ОДНА', 'ИГРА', 'УТРО', 'ЮНГА']); // слова не имена и не вещи
+                'РОМА', 'САША', 'ТЁМА', 'ТАНЯ', 'ТОЛЯ', 'ТОМА', 'ФЕДЯ', 'ЛЁНЯ',
+                'АРФА', 'АРКА', 'БАК', 'БАЯН', 'БОК', 'БОР', 'БЫК', 'ВЕЕР', 'ВОЗ', 'ВОЛ', 'ВОЛК',
+                'ГАЗ', 'ГОД', 'ДОМ', 'ДУБ', 'ДУШ', 'ДЫМ', 'ЕСЛИ', 'ЖУК', 'ИГРА', 'ИКРА',
+                'ЙОД', 'КИТ', 'КОЛ', 'КОМ', 'КОТ', 'КОФЕ', 'КРАЙ', 'КРАН', 'ЛАК', 'ЛЕВ', 'ЛЕС', 'ЛЕЩ',
+                'ЛИФТ', 'ЛОМ', 'ЛЫЖИ', 'ЛЮК', 'МАК', 'МЕЛ', 'МЕХ', 'МЕЧ', 'МОХ', 'МУХА', 'МЫЛО', 'МЫС',
+                'МЯЧ', 'НОЖ', 'НОС', 'ОДНА', 'ОЖОГ', 'ОКНО', 'ОЧКИ', 'ПАУК', 'ПЕРО', 'ПУХ', 'РАК', 'РИС',
+                'РОТ', 'РЫБА', 'СОК', 'СОМ', 'СОР', 'СТУЛ', 'СУК', 'СУП', 'СЫР', 'ТАЗ', 'ТОРТ', 'ТРОС',
+                'УГОЛ', 'УРНА', 'УТКА', 'УТРО', 'УХО', 'УШКО', 'ЧАЙ', 'ЧЕК', 'ШАГ', 'ШОВ', 'ЩИТ',
+                'ЮБКА', 'ЮНГА', 'ЯХТА'
+            ];
 
-            function getVowel(syllable) {
-                if (syllable.length !== 2) return null;
-                const lower = syllable.toLowerCase();
-                const first = lower[0];
-                const second = lower[1];
-                if (vowels.includes(first) && !vowels.includes(second)) return first;
-                if (!vowels.includes(first) && vowels.includes(second)) return second;
-                return null;
-            }
-
-            function sortVowels(arr) {
-                const groups = {};
-                vowels.forEach(v => groups[v] = []);
-                const words = [];
-
-                arr.forEach(item => {
-                    const vowel = getVowel(item);
-                    if (vowel) {
-                        groups[vowel].push(item);
-                    } else {
-                        words.push(item);
-                    }
-                });
-
-                // Сортируем внутри каждой группы по алфавиту
-                vowels.forEach(v => {
-                    groups[v].sort((a, b) => a.localeCompare(b, 'ru', { sensitivity: 'base' }));
-                });
-
-                // Классифицируем слова
-                const namesArr = words.filter(w => names.has(w)).sort((a, b) => a.localeCompare(b, 'ru'));
-                const thingsArr = words.filter(w => !names.has(w) && !misc.has(w)).sort((a, b) => a.localeCompare(b, 'ru'));
-                const miscArr = words.filter(w => misc.has(w)).sort((a, b) => a.localeCompare(b, 'ru'));
-
-                // Собираем итоговый массив
-                const result = [];
-                vowels.forEach(v => result.push(...groups[v]));
-                result.push(...namesArr, ...thingsArr, ...miscArr);
-                return result;
-            }
-
-            // ============ ОСНОВНАЯ ЛОГИКА ============
             let currentMode = 'default';
             let randomItems = [];
             const grid = document.getElementById('syllableGrid');
@@ -504,7 +432,7 @@
                     if (randomItems.length === 0) generateRandomItems();
                     items = randomItems;
                 } else if (currentMode === 'vowels') {
-                    items = sortVowels(defaultItems);
+                    items = vowelsItems;
                 } else {
                     items = defaultItems;
                 }
@@ -608,7 +536,8 @@
             }
 
             function generateRandomItems() {
-                const shuffled = defaultItems.slice().sort(() => Math.random() - 0.5);
+                const allItems = [...new Set([...defaultItems, ...vowelsItems])];
+                const shuffled = allItems.sort(() => Math.random() - 0.5);
                 randomItems = shuffled.slice(0, Math.min(10, shuffled.length));
             }
 
