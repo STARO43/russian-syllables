@@ -27,7 +27,6 @@
             --font: 'PT Serif', serif;
         }
 
-        /* Светлая тема */
         body.light-mode {
             --bg: #f5f7fa;
             --bg-card: #ffffff;
@@ -112,6 +111,48 @@
             font-weight: 500;
         }
 
+        /* Панель управления */
+        .controls {
+            max-width: 900px;
+            margin: 12px auto 0;
+            padding: 0 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+        }
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .controls select, .controls button {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-family: var(--font);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .controls select:hover, .controls button:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+        .controls button.active {
+            background: var(--accent-glow);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        .hidden {
+            display: none !important;
+        }
+
         .grid-container {
             max-width: 900px;
             margin: 0 auto;
@@ -123,6 +164,9 @@
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 10px;
+        }
+        .syllable-grid.hide-learned .syllable-card.learned {
+            display: none;
         }
 
         .syllable-card {
@@ -257,7 +301,6 @@
             border-top: 1px solid var(--border);
         }
 
-        /* Адаптивность */
         @media (max-width: 900px) {
             .syllable-grid {
                 grid-template-columns: repeat(3, 1fr);
@@ -287,8 +330,14 @@
             .grid-container {
                 padding: 12px 12px 32px;
             }
+            .controls {
+                gap: 6px;
+            }
+            .controls select, .controls button {
+                padding: 6px 8px;
+                font-size: 0.8rem;
+            }
         }
-        /* Убрали блок с max-width:400px, чтобы всегда было по две колонки */
     </style>
 </head>
 <body>
@@ -300,6 +349,25 @@
         <h1>Грамотиньо</h1>
         <p>Жми, слушай, запоминай</p>
     </header>
+
+    <!-- Панель управления -->
+    <div class="controls">
+        <div class="control-group">
+            <label for="sortMode">Сортировка:</label>
+            <select id="sortMode">
+                <option value="default" selected>По умолчанию</option>
+                <option value="vowels">От гласных</option>
+                <option value="random">10 случайных</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <button id="randomRefresh" class="hidden" title="Заменить случайные">🔄 Заменить</button>
+        </div>
+        <div class="control-group">
+            <label for="hideLearned">Скрыть отмеченные</label>
+            <input type="checkbox" id="hideLearned">
+        </div>
+    </div>
 
     <main class="grid-container">
         <div class="syllable-grid" id="syllableGrid"></div>
@@ -313,7 +381,7 @@
 
     <script>
         (function() {
-            // Удалены слоги: "ЁТ", "ИЦ", "ГЁ", "ВЁ", "БЁ", "ИГ"
+            // Исходный список элементов (после удаления указанных слогов)
             const rawItems = [
                 'ЁЖ', 'ёлка', 'ЁН', 'АБ', 'АВ', 'АГ', 'АД', 'АЖ', 'АЗ', 'АК', 'АЛ', 'Алла', 'АМ', 'АН', 'Анна', 'АП', 'арка', 'арфа', 'АС', 'АТ', 'АХ', 'АЧ', 'АШ',
                 'БА', 'БАК', 'БАЯН', 'БЕ', 'БИ', 'БО', 'БОК', 'БОР', 'Боря', 'БЫ', 'БЫК', 'БЭ', 'БЮ', 'БЯ',
@@ -345,30 +413,103 @@
                 'юбка', 'ЮГ', 'юнга', 'ЯБ', 'ЯВ', 'ЯГ', 'ЯД', 'ЯК', 'ЯЛ', 'ЯМ', 'ЯН', 'ЯП', 'ЯР', 'ЯС', 'ЯТ', 'ЯХ', 'яхта', 'ЯЦ'
             ];
 
-            // Сортировка: по длине, затем по алфавиту
-            const syllables = rawItems.sort((a, b) => {
-                const lenDiff = a.length - b.length;
-                if (lenDiff !== 0) return lenDiff;
-                return a.localeCompare(b, 'ru', { sensitivity: 'base' });
-            });
+            // Классификация слов
+            const names = new Set([
+                'Алла', 'Анна', 'Боря', 'Валя', 'Витя', 'Вова', 'Галя', 'Гена', 'Женя', 'Зина',
+                'Катя', 'Коля', 'Лёва', 'Лёша', 'Лена', 'Люба', 'Люда', 'Миша', 'Нина', 'Петя',
+                'Рома', 'Саша', 'Тёма', 'Таня', 'Толя', 'Тома', 'Федя'
+            ]);
+            const misc = new Set(['если', 'одна', 'игра', 'утро', 'юнга']); // остальные слова, не являющиеся именами и вещами
 
+            const vowels = ['а', 'е', 'ё', 'и', 'о', 'у', 'ы', 'э', 'ю', 'я'];
+
+            // Получение гласной буквы для двухбуквенного слога
+            function getVowel(syllable) {
+                if (syllable.length !== 2) return null;
+                const lower = syllable.toLowerCase();
+                const first = lower[0];
+                const second = lower[1];
+                if (vowels.includes(first) && !vowels.includes(second)) return first;
+                if (!vowels.includes(first) && vowels.includes(second)) return second;
+                return null; // если обе гласные или обе согласные (не слог)
+            }
+
+            // Сортировка "по умолчанию": длина, затем алфавит
+            function sortDefault(arr) {
+                return arr.slice().sort((a, b) => {
+                    const lenDiff = a.length - b.length;
+                    if (lenDiff !== 0) return lenDiff;
+                    return a.localeCompare(b, 'ru', { sensitivity: 'base' });
+                });
+            }
+
+            // Сортировка "от гласных": слоги по гласным, затем имена, вещи, остальное
+            function sortVowels(arr) {
+                const syllables = [];
+                const others = [];
+                arr.forEach(item => {
+                    if (item.length === 2 && getVowel(item)) {
+                        syllables.push(item);
+                    } else {
+                        others.push(item);
+                    }
+                });
+
+                // Группируем слоги по гласной
+                const groups = {};
+                vowels.forEach(v => groups[v] = []);
+                syllables.forEach(syl => {
+                    const v = getVowel(syl);
+                    if (v) groups[v].push(syl);
+                });
+
+                const sortedSyllables = [];
+                vowels.forEach(v => {
+                    groups[v].sort((a, b) => a.localeCompare(b, 'ru', { sensitivity: 'base' }));
+                    sortedSyllables.push(...groups[v]);
+                });
+
+                // Слова: имена, вещи, остальное
+                const namesArr = others.filter(w => names.has(w)).sort((a, b) => a.localeCompare(b, 'ru'));
+                const thingsArr = others.filter(w => !names.has(w) && !misc.has(w)).sort((a, b) => a.localeCompare(b, 'ru'));
+                const miscArr = others.filter(w => misc.has(w)).sort((a, b) => a.localeCompare(b, 'ru'));
+
+                return [...sortedSyllables, ...namesArr, ...thingsArr, ...miscArr];
+            }
+
+            // Функция для получения отображаемых элементов в зависимости от режима
+            function getDisplayedItems() {
+                const mode = sortModeSelect.value;
+                if (mode === 'random') {
+                    if (randomItems.length === 0) generateRandomItems();
+                    return randomItems;
+                } else if (mode === 'vowels') {
+                    return sortVowels(rawItems);
+                } else {
+                    return sortDefault(rawItems);
+                }
+            }
+
+            // Генерация 10 случайных элементов
+            function generateRandomItems() {
+                const shuffled = rawItems.slice().sort(() => Math.random() - 0.5);
+                randomItems = shuffled.slice(0, Math.min(10, shuffled.length));
+            }
+
+            // Элементы DOM
             const grid = document.getElementById('syllableGrid');
             const toastContainer = document.getElementById('toastContainer');
             const themeToggle = document.getElementById('themeToggle');
-
-            // Инициализация темы
-            if (localStorage.getItem('theme') === 'light') {
-                document.body.classList.add('light-mode');
-            }
-            themeToggle.addEventListener('click', () => {
-                document.body.classList.toggle('light-mode');
-                localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
-            });
+            const sortModeSelect = document.getElementById('sortMode');
+            const randomRefreshBtn = document.getElementById('randomRefresh');
+            const hideLearnedCheckbox = document.getElementById('hideLearned');
 
             let currentAudio = null;
             let activeCardIndex = null;
             let isPlaying = false;
+            let randomItems = [];
 
+            // Изученные элементы храним как Set строк
             function loadLearnedSet() {
                 try {
                     const data = localStorage.getItem('learned_syllables');
@@ -388,12 +529,43 @@
 
             let learnedSet = loadLearnedSet();
 
+            // Инициализация темы
+            if (localStorage.getItem('theme') === 'light') {
+                document.body.classList.add('light-mode');
+            }
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('light-mode');
+                localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+            });
+
+            // Переключение режима сортировки
+            sortModeSelect.addEventListener('change', () => {
+                if (sortModeSelect.value === 'random') {
+                    randomItems = [];
+                    randomRefreshBtn.classList.remove('hidden');
+                } else {
+                    randomRefreshBtn.classList.add('hidden');
+                }
+                renderGrid();
+            });
+
+            // Обновление случайных карточек
+            randomRefreshBtn.addEventListener('click', () => {
+                generateRandomItems();
+                renderGrid();
+            });
+
+            // Скрытие изученных
+            hideLearnedCheckbox.addEventListener('change', () => {
+                grid.classList.toggle('hide-learned', hideLearnedCheckbox.checked);
+            });
+
             function renderGrid() {
                 grid.innerHTML = '';
-                syllables.forEach((syllable, index) => {
+                const items = getDisplayedItems();
+                items.forEach((syllable) => {
                     const card = document.createElement('div');
                     card.className = 'syllable-card';
-                    card.dataset.index = index;
                     card.dataset.syllable = syllable;
                     card.setAttribute('role', 'button');
                     card.setAttribute('tabindex', '0');
@@ -408,43 +580,40 @@
                     dot.className = 'learn-dot';
                     dot.title = 'Отметить';
                     dot.setAttribute('role', 'checkbox');
-                    dot.setAttribute('aria-checked', learnedSet.has(index));
+                    dot.setAttribute('aria-checked', learnedSet.has(syllable));
                     card.appendChild(dot);
 
-                    if (learnedSet.has(index)) {
+                    if (learnedSet.has(syllable)) {
                         card.classList.add('learned');
                     }
 
                     dot.addEventListener('click', (e) => {
                         e.stopPropagation();
-                        toggleLearned(index);
+                        toggleLearned(syllable, card);
                     });
 
-                    card.addEventListener('click', () => handleSyllableClick(index));
+                    card.addEventListener('click', () => handleSyllableClick(syllable, card));
                     card.addEventListener('keydown', (e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
                             e.preventDefault();
-                            handleSyllableClick(index);
+                            handleSyllableClick(syllable, card);
                         }
                     });
 
                     grid.appendChild(card);
                 });
+                console.log(`🔤 Показано ${items.length} элементов`);
             }
 
-            function toggleLearned(index) {
-                if (learnedSet.has(index)) {
-                    learnedSet.delete(index);
+            function toggleLearned(syllable, card) {
+                if (learnedSet.has(syllable)) {
+                    learnedSet.delete(syllable);
                 } else {
-                    learnedSet.add(index);
+                    learnedSet.add(syllable);
                 }
                 saveLearnedSet(learnedSet);
-                const cards = document.querySelectorAll('.syllable-card');
-                const card = cards[index];
-                if (card) {
-                    card.classList.toggle('learned', learnedSet.has(index));
-                }
-                showToast(learnedSet.has(index) ? '✓' : '(:', 'success');
+                card.classList.toggle('learned', learnedSet.has(syllable));
+                // если скрытие включено, скрываем/показываем карточку автоматически (CSS)
             }
 
             function showToast(message, type = 'info') {
@@ -475,13 +644,9 @@
                 clearPlayingState();
             }
 
-            function handleSyllableClick(index) {
-                const syllable = syllables[index];
+            function handleSyllableClick(syllable, card) {
                 stopAudio();
-
-                activeCardIndex = index;
-                const cards = document.querySelectorAll('.syllable-card');
-                if (cards[index]) cards[index].classList.add('playing');
+                card.classList.add('playing');
                 isPlaying = true;
 
                 const audio = new Audio('audio/' + syllable + '.mp3');
@@ -495,10 +660,8 @@
                 audio.addEventListener('error', (e) => {
                     console.error('Ошибка загрузки аудио:', e);
                     clearPlayingState();
-                    if (cards[index]) {
-                        cards[index].classList.add('error');
-                        setTimeout(() => cards[index].classList.remove('error'), 1000);
-                    }
+                    card.classList.add('error');
+                    setTimeout(() => card.classList.remove('error'), 1000);
                     showToast('Не удалось загрузить аудио', 'error');
                 });
 
@@ -508,17 +671,15 @@
                     } else {
                         console.error('Ошибка воспроизведения:', err);
                         clearPlayingState();
-                        if (cards[index]) {
-                            cards[index].classList.add('error');
-                            setTimeout(() => cards[index].classList.remove('error'), 1000);
-                        }
+                        card.classList.add('error');
+                        setTimeout(() => card.classList.remove('error'), 1000);
                         showToast('Ошибка воспроизведения', 'error');
                     }
                 });
             }
 
+            // Первоначальный рендер
             renderGrid();
-            console.log(`🔤 Загружено ${syllables.length} элементов`);
         })();
     </script>
 </body>
