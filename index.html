@@ -27,6 +27,18 @@
             --font: 'PT Serif', serif;
         }
 
+        /* Десять цветовых тем (меняют акцент и подсветку) */
+        body.theme-blue   { --accent: #4da3ff; --accent-glow: rgba(77, 163, 255, 0.25); --learned: #3fb950; --learned-bg: rgba(63, 185, 80, 0.2); }
+        body.theme-green  { --accent: #4ade80; --accent-glow: rgba(74, 222, 128, 0.25); --learned: #38bdf8; --learned-bg: rgba(56, 189, 248, 0.2); }
+        body.theme-red    { --accent: #f87171; --accent-glow: rgba(248, 113, 113, 0.25); --learned: #a78bfa; --learned-bg: rgba(167, 139, 250, 0.2); }
+        body.theme-orange { --accent: #fb923c; --accent-glow: rgba(251, 146, 60, 0.25); --learned: #fbbf24; --learned-bg: rgba(251, 191, 36, 0.2); }
+        body.theme-purple { --accent: #c084fc; --accent-glow: rgba(192, 132, 252, 0.25); --learned: #60a5fa; --learned-bg: rgba(96, 165, 250, 0.2); }
+        body.theme-pink   { --accent: #f472b6; --accent-glow: rgba(244, 114, 182, 0.25); --learned: #34d399; --learned-bg: rgba(52, 211, 153, 0.2); }
+        body.theme-cyan   { --accent: #22d3ee; --accent-glow: rgba(34, 211, 238, 0.25); --learned: #a3e635; --learned-bg: rgba(163, 230, 53, 0.2); }
+        body.theme-yellow { --accent: #facc15; --accent-glow: rgba(250, 204, 21, 0.25); --learned: #10b981; --learned-bg: rgba(16, 185, 129, 0.2); }
+        body.theme-teal   { --accent: #2dd4bf; --accent-glow: rgba(45, 212, 191, 0.25); --learned: #f59e0b; --learned-bg: rgba(245, 158, 11, 0.2); }
+        body.theme-indigo { --accent: #818cf8; --accent-glow: rgba(129, 140, 248, 0.25); --learned: #f472b6; --learned-bg: rgba(244, 114, 182, 0.2); }
+
         body.light-mode {
             --bg: #f5f7fa;
             --bg-card: #ffffff;
@@ -54,14 +66,14 @@
             display: flex;
             flex-direction: column;
             transition: background 0.3s, color 0.3s;
-            background-image: radial-gradient(circle at 20% 20%, rgba(77, 163, 255, 0.03) 0%, transparent 50%),
-                              radial-gradient(circle at 80% 80%, rgba(77, 163, 255, 0.03) 0%, transparent 50%);
+            background-image: radial-gradient(circle at 20% 20%, var(--accent-glow) 0%, transparent 50%),
+                              radial-gradient(circle at 80% 80%, var(--accent-glow) 0%, transparent 50%);
         }
 
         .header {
             padding: 32px 20px 16px;
             text-align: center;
-            background: linear-gradient(180deg, rgba(77, 163, 255, 0.06) 0%, transparent 100%);
+            background: linear-gradient(180deg, var(--accent-glow) 0%, transparent 100%);
             border-bottom: 1px solid var(--border);
             position: relative;
         }
@@ -215,6 +227,39 @@
             transform: translateX(-50%) translateY(0);
         }
 
+        /* Палитра тем */
+        .theme-palette {
+            display: none;
+            gap: 8px;
+            padding: 8px 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            background: var(--bg-card);
+            border-radius: 30px;
+            margin: 0 auto;
+            width: fit-content;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .theme-palette.show {
+            display: flex;
+        }
+        .color-dot {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: transform 0.2s;
+        }
+        .color-dot:hover {
+            transform: scale(1.2);
+            border-color: var(--text-secondary);
+        }
+        .color-dot.active {
+            border-color: var(--text);
+            box-shadow: 0 0 8px var(--accent-glow);
+        }
+
         .grid-container {
             max-width: 900px;
             margin: 0 auto;
@@ -355,6 +400,90 @@
             to { opacity: 0; transform: translateY(10px); }
         }
 
+        /* Кнопка "Наверх" */
+        .scroll-top-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: var(--transition);
+            z-index: 1001;
+        }
+        .scroll-top-btn.visible {
+            display: flex;
+        }
+        .scroll-top-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            box-shadow: 0 0 16px var(--accent-glow);
+        }
+
+        /* Экран экзамена */
+        .exam-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            gap: 20px;
+        }
+        .exam-question {
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-align: center;
+        }
+        .exam-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            max-width: 500px;
+            width: 100%;
+        }
+        .exam-option {
+            padding: 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            cursor: pointer;
+            text-align: center;
+            font-size: 1.1rem;
+            transition: var(--transition);
+        }
+        .exam-option:hover {
+            border-color: var(--accent);
+            background: var(--bg-card-hover);
+        }
+        .exam-option.correct {
+            border-color: #3fb950;
+            background: rgba(63,185,80,0.2);
+        }
+        .exam-option.wrong {
+            border-color: var(--danger);
+            background: rgba(248,81,73,0.2);
+        }
+        .exam-result {
+            font-size: 1.3rem;
+            text-align: center;
+        }
+
         .footer {
             text-align: center;
             padding: 20px;
@@ -364,31 +493,20 @@
         }
 
         /* Адаптивность */
-       @media (max-width: 1024px) {
-    .syllable-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-}
-@media (max-width: 600px) {
-    .syllable-grid { grid-template-columns: repeat(2, 1fr); gap: 5px; }
-    .syllable-card { font-size: 1rem; padding: 12px 4px; min-height: 50px; }
-    .learn-dot { width: 12px; height: 12px; bottom: 4px; right: 4px; }
-    .controls { gap: 6px; }
-    .controls button { width: 40px; height: 40px; font-size: 1.1rem; }
-    .controls button::after { font-size: 0.7rem; padding: 4px 8px; }
-
-    /* Исправление наложения кнопки темы */
-    .theme-toggle {
-        top: 8px;
-        right: 8px;
-    }
-    .theme-toggle button {
-        width: 36px;
-        height: 36px;
-        font-size: 1rem;
-    }
-    .header {
-        padding: 40px 16px 12px;
-    }
-}
+        @media (max-width: 1024px) {
+            .syllable-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        }
+        @media (max-width: 600px) {
+            .syllable-grid { grid-template-columns: repeat(2, 1fr); gap: 5px; }
+            .syllable-card { font-size: 1rem; padding: 12px 4px; min-height: 50px; }
+            .learn-dot { width: 12px; height: 12px; bottom: 4px; right: 4px; }
+            .controls { gap: 6px; }
+            .controls button { width: 40px; height: 40px; font-size: 1.1rem; }
+            .controls button::after { font-size: 0.7rem; padding: 4px 8px; }
+            .theme-toggle { top: 8px; right: 8px; }
+            .theme-toggle button { width: 36px; height: 36px; font-size: 1rem; }
+            .header { padding: 40px 16px 12px; }
+        }
     </style>
 </head>
 <body>
@@ -403,7 +521,7 @@
 
     <!-- Прогресс -->
     <div class="progress-container">
-        <div class="progress-label" id="progressLabel">Скрыто: 0 из 0</div>
+        <div class="progress-label" id="progressLabel">Отмечено: 0 из 0</div>
         <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
     </div>
 
@@ -413,11 +531,37 @@
         <button id="randomBtn" data-tooltip="Случайно">🎲</button>
         <button id="hideLearnedBtn" data-tooltip="Скрыть/показать">✂</button>
         <button id="clearLearnedBtn" data-tooltip="Очистить">☑</button>
+        <button id="paletteBtn" data-tooltip="Темы">🎨</button>
+        <button id="examBtn" data-tooltip="Экзамен">📝</button>
+    </div>
+
+    <!-- Палитра тем -->
+    <div class="theme-palette" id="themePalette">
+        <div class="color-dot" data-theme="theme-blue" style="background:#4da3ff;" title="Синяя"></div>
+        <div class="color-dot" data-theme="theme-green" style="background:#4ade80;" title="Зелёная"></div>
+        <div class="color-dot" data-theme="theme-red" style="background:#f87171;" title="Красная"></div>
+        <div class="color-dot" data-theme="theme-orange" style="background:#fb923c;" title="Оранжевая"></div>
+        <div class="color-dot" data-theme="theme-purple" style="background:#c084fc;" title="Фиолетовая"></div>
+        <div class="color-dot" data-theme="theme-pink" style="background:#f472b6;" title="Розовая"></div>
+        <div class="color-dot" data-theme="theme-cyan" style="background:#22d3ee;" title="Голубая"></div>
+        <div class="color-dot" data-theme="theme-yellow" style="background:#facc15;" title="Жёлтая"></div>
+        <div class="color-dot" data-theme="theme-teal" style="background:#2dd4bf;" title="Бирюзовая"></div>
+        <div class="color-dot" data-theme="theme-indigo" style="background:#818cf8;" title="Индиго"></div>
     </div>
 
     <main class="grid-container">
         <div class="syllable-grid" id="syllableGrid"></div>
     </main>
+
+    <!-- Кнопка "Наверх" -->
+    <button class="scroll-top-btn" id="scrollTopBtn" title="Наверх">↑</button>
+
+    <!-- Экзамен (скрыт по умолчанию) -->
+    <div class="exam-overlay" id="examOverlay" style="display:none;">
+        <div class="exam-question" id="examQuestion"></div>
+        <div class="exam-options" id="examOptions"></div>
+        <div class="exam-result" id="examResult"></div>
+    </div>
 
     <footer class="footer">
         <p>Спасибо за вайбкодинг в тегешечку @vnvax</p>
@@ -459,13 +603,13 @@
                 'юбка', 'ЮГ', 'юнга', 'ЯБ', 'ЯВ', 'ЯГ', 'ЯД', 'ЯК', 'ЯЛ', 'ЯМ', 'ЯН', 'ЯП', 'ЯР', 'ЯС', 'ЯТ', 'ЯХ', 'яхта', 'ЯЦ'
             ];
 
-            // Сортировка: длина, алфавит
             const syllables = rawItems.sort((a, b) => {
                 const lenDiff = a.length - b.length;
                 if (lenDiff !== 0) return lenDiff;
                 return a.localeCompare(b, 'ru', { sensitivity: 'base' });
             });
 
+            // DOM элементы
             const grid = document.getElementById('syllableGrid');
             const toastContainer = document.getElementById('toastContainer');
             const themeToggle = document.getElementById('themeToggle');
@@ -473,25 +617,81 @@
             const randomBtn = document.getElementById('randomBtn');
             const hideLearnedBtn = document.getElementById('hideLearnedBtn');
             const clearLearnedBtn = document.getElementById('clearLearnedBtn');
+            const paletteBtn = document.getElementById('paletteBtn');
+            const examBtn = document.getElementById('examBtn');
             const progressLabel = document.getElementById('progressLabel');
             const progressFill = document.getElementById('progressFill');
+            const themePalette = document.getElementById('themePalette');
+            const colorDots = document.querySelectorAll('.color-dot');
+            const scrollTopBtn = document.getElementById('scrollTopBtn');
+            const examOverlay = document.getElementById('examOverlay');
+            const examQuestion = document.getElementById('examQuestion');
+            const examOptions = document.getElementById('examOptions');
+            const examResult = document.getElementById('examResult');
 
             let currentMode = 'all';
             let randomItems = [];
-
             let currentAudio = null;
             let isPlaying = false;
+            let examQuestions = [];
+            let examIndex = 0;
+            let examScore = 0;
 
+            // Изученные
             function loadLearnedSet() {
-                try {
-                    return new Set(JSON.parse(localStorage.getItem('learned_syllables') || '[]'));
-                } catch { return new Set(); }
+                try { return new Set(JSON.parse(localStorage.getItem('learned_syllables') || '[]')); }
+                catch { return new Set(); }
             }
             function saveLearnedSet(set) {
                 localStorage.setItem('learned_syllables', JSON.stringify(Array.from(set)));
             }
             let learnedSet = loadLearnedSet();
 
+            // Темы
+            function applyTheme(themeClass) {
+                document.body.className = '';
+                document.body.classList.add(themeClass);
+                if (localStorage.getItem('theme') === 'light') {
+                    document.body.classList.add('light-mode');
+                }
+                localStorage.setItem('accentTheme', themeClass);
+                colorDots.forEach(dot => {
+                    dot.classList.toggle('active', dot.dataset.theme === themeClass);
+                });
+            }
+
+            // Инициализация темы
+            const savedTheme = localStorage.getItem('accentTheme') || 'theme-blue';
+            applyTheme(savedTheme);
+            if (localStorage.getItem('theme') === 'light') {
+                document.body.classList.add('light-mode');
+            }
+
+            // Переключение светлая/тёмная
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('light-mode');
+                localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+            });
+
+            // Палитра
+            paletteBtn.addEventListener('click', () => {
+                themePalette.classList.toggle('show');
+            });
+            colorDots.forEach(dot => {
+                dot.addEventListener('click', () => {
+                    applyTheme(dot.dataset.theme);
+                });
+            });
+
+            // Кнопка "Наверх"
+            window.addEventListener('scroll', () => {
+                scrollTopBtn.classList.toggle('visible', window.scrollY > 300);
+            });
+            scrollTopBtn.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            // Функции обновления прогресса
             function updateProgress() {
                 const total = syllables.length;
                 const marked = [...syllables].filter(s => learnedSet.has(s)).length;
@@ -500,48 +700,32 @@
                 progressFill.style.width = percent + '%';
             }
 
-            if (localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
-            themeToggle.addEventListener('click', () => {
-                document.body.classList.toggle('light-mode');
-                localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
-            });
-
-            function generateRandomItems() {
-                const shuffled = syllables.slice().sort(() => Math.random() - 0.5);
-                randomItems = shuffled.slice(0, Math.min(10, shuffled.length));
-            }
-
+            // Рендер сетки
             function renderGrid() {
                 grid.innerHTML = '';
                 const items = currentMode === 'random' ? randomItems : syllables;
-
-                items.forEach((syllable) => {
+                items.forEach(syllable => {
                     const card = document.createElement('div');
                     card.className = 'syllable-card';
                     card.dataset.syllable = syllable;
                     card.setAttribute('role', 'button');
                     card.setAttribute('tabindex', '0');
-
                     const textSpan = document.createElement('span');
                     textSpan.className = 'syllable-text';
                     textSpan.textContent = syllable;
                     textSpan.style.pointerEvents = 'none';
                     card.appendChild(textSpan);
-
                     const dot = document.createElement('div');
                     dot.className = 'learn-dot';
-                    dot.title = 'Минус';
+                    dot.title = 'Отметить';
                     dot.setAttribute('role', 'checkbox');
                     dot.setAttribute('aria-checked', learnedSet.has(syllable));
                     card.appendChild(dot);
-
                     if (learnedSet.has(syllable)) card.classList.add('learned');
-
                     dot.addEventListener('click', (e) => {
                         e.stopPropagation();
                         toggleLearned(syllable, card);
                     });
-
                     card.addEventListener('click', () => handleSyllableClick(syllable, card));
                     card.addEventListener('keydown', (e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
@@ -549,7 +733,6 @@
                             handleSyllableClick(syllable, card);
                         }
                     });
-
                     grid.appendChild(card);
                 });
                 updateProgress();
@@ -566,13 +749,117 @@
                 updateProgress();
             }
 
-            function clearAllLearned() {
+            // Воспроизведение звука
+            function playAudio(syllable) {
+                if (currentAudio) {
+                    currentAudio.pause();
+                    currentAudio.src = '';
+                }
+                const audio = new Audio('audio/' + syllable + '.mp3');
+                audio.volume = 1;
+                currentAudio = audio;
+                audio.addEventListener('ended', () => { currentAudio = null; });
+                audio.play().catch(() => {});
+            }
+
+            function handleSyllableClick(syllable, card) {
+                card.classList.add('playing');
+                setTimeout(() => card.classList.remove('playing'), 700);
+                playAudio(syllable);
+            }
+
+            // Режимы
+            normalBtn.addEventListener('click', () => {
+                currentMode = 'all';
+                normalBtn.classList.add('active');
+                randomBtn.classList.remove('active');
+                renderGrid();
+            });
+            randomBtn.addEventListener('click', () => {
+                currentMode = 'random';
+                generateRandomItems();
+                randomBtn.classList.add('active');
+                normalBtn.classList.remove('active');
+                renderGrid();
+            });
+            function generateRandomItems() {
+                const shuffled = syllables.slice().sort(() => Math.random() - 0.5);
+                randomItems = shuffled.slice(0, Math.min(10, shuffled.length));
+            }
+
+            hideLearnedBtn.addEventListener('click', () => {
+                hideLearnedBtn.classList.toggle('active');
+                grid.classList.toggle('hide-learned', hideLearnedBtn.classList.contains('active'));
+            });
+
+            clearLearnedBtn.addEventListener('click', () => {
                 learnedSet.clear();
                 saveLearnedSet(learnedSet);
                 renderGrid();
-                showToast('Очищено', 'success');
+                showToast('Отметки сброшены', 'success');
+            });
+
+            // Экзамен
+            examBtn.addEventListener('click', startExam);
+            function startExam() {
+                // Скрываем сетку, показываем оверлей
+                examOverlay.style.display = 'flex';
+                examQuestions = getRandomExamQuestions(10);
+                examIndex = 0;
+                examScore = 0;
+                showNextExamQuestion();
+            }
+            function getRandomExamQuestions(count) {
+                const shuffled = syllables.slice().sort(() => Math.random() - 0.5);
+                return shuffled.slice(0, Math.min(count, shuffled.length));
+            }
+            function showNextExamQuestion() {
+                if (examIndex >= examQuestions.length) {
+                    examOverlay.style.display = 'none';
+                    showToast(`Экзамен завершён! Верно ${examScore} из ${examQuestions.length}`, 'success');
+                    return;
+                }
+                const correct = examQuestions[examIndex];
+                examQuestion.textContent = `Вопрос ${examIndex+1} из ${examQuestions.length}`;
+                examResult.textContent = '';
+                // Генерируем варианты: правильный + 4 случайных
+                const variants = new Set([correct]);
+                while (variants.size < 5) {
+                    const randomItem = syllables[Math.floor(Math.random() * syllables.length)];
+                    if (!variants.has(randomItem)) variants.add(randomItem);
+                }
+                const variantsArray = [...variants].sort(() => Math.random() - 0.5);
+                examOptions.innerHTML = '';
+                variantsArray.forEach(variant => {
+                    const btn = document.createElement('button');
+                    btn.className = 'exam-option';
+                    btn.textContent = variant;
+                    btn.addEventListener('click', () => handleExamAnswer(btn, variant, correct));
+                    examOptions.appendChild(btn);
+                });
+                // Автовоспроизведение звука
+                playAudio(correct);
+            }
+            function handleExamAnswer(btn, selected, correct) {
+                const allOptions = examOptions.querySelectorAll('.exam-option');
+                allOptions.forEach(opt => opt.disabled = true);
+                if (selected === correct) {
+                    btn.classList.add('correct');
+                    examScore++;
+                } else {
+                    btn.classList.add('wrong');
+                    allOptions.forEach(opt => {
+                        if (opt.textContent === correct) opt.classList.add('correct');
+                    });
+                }
+                examResult.textContent = selected === correct ? 'Правильно!' : `Неверно! Правильно: ${correct}`;
+                setTimeout(() => {
+                    examIndex++;
+                    showNextExamQuestion();
+                }, 1500);
             }
 
+            // Toast
             function showToast(message, type = 'info') {
                 const toast = document.createElement('div');
                 toast.className = 'toast';
@@ -582,70 +869,6 @@
                 toastContainer.appendChild(toast);
                 setTimeout(() => toast.remove(), 2000);
             }
-
-            function clearPlayingState() {
-                document.querySelectorAll('.syllable-card.playing').forEach(c => c.classList.remove('playing'));
-                isPlaying = false;
-                currentAudio = null;
-            }
-
-            function stopAudio() {
-                if (currentAudio) {
-                    currentAudio.pause();
-                    currentAudio.src = '';
-                    currentAudio = null;
-                }
-                clearPlayingState();
-            }
-
-            function handleSyllableClick(syllable, card) {
-                stopAudio();
-                card.classList.add('playing');
-                isPlaying = true;
-
-                const audio = new Audio('audio/' + syllable + '.mp3');
-                audio.volume = 1;
-                currentAudio = audio;
-
-                audio.addEventListener('ended', clearPlayingState);
-                audio.addEventListener('error', () => {
-                    clearPlayingState();
-                    card.classList.add('error');
-                    setTimeout(() => card.classList.remove('error'), 1000);
-                    showToast('Не удалось загрузить аудио', 'error');
-                });
-                audio.play().catch(err => {
-                    if (err.name !== 'AbortError') {
-                        clearPlayingState();
-                        card.classList.add('error');
-                        setTimeout(() => card.classList.remove('error'), 1000);
-                        showToast('Ошибка воспроизведения', 'error');
-                    }
-                });
-            }
-
-            // Обработчики
-            normalBtn.addEventListener('click', () => {
-                currentMode = 'all';
-                normalBtn.classList.add('active');
-                randomBtn.classList.remove('active');
-                renderGrid();
-            });
-
-            randomBtn.addEventListener('click', () => {
-                currentMode = 'random';
-                generateRandomItems();
-                randomBtn.classList.add('active');
-                normalBtn.classList.remove('active');
-                renderGrid();
-            });
-
-            hideLearnedBtn.addEventListener('click', () => {
-                hideLearnedBtn.classList.toggle('active');
-                grid.classList.toggle('hide-learned', hideLearnedBtn.classList.contains('active'));
-            });
-
-            clearLearnedBtn.addEventListener('click', clearAllLearned);
 
             // Старт
             renderGrid();
