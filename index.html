@@ -314,7 +314,7 @@
 
     <!-- Кнопки-иконки -->
     <div class="controls">
-        <button class="mode-btn active" data-mode="default" title="Обычная сортировка">🔤</button>
+        <button class="mode-btn active" data-mode="default" title="Обычная сортировка">📚</button>
         <button class="mode-btn" data-mode="vowels" title="Сортировка от гласных">🗣️</button>
         <button class="mode-btn" data-mode="random" title="10 случайных">🎲</button>
         <button class="mode-btn" id="hideLearnedBtn" title="Скрыть изученные">🙈</button>
@@ -325,7 +325,7 @@
     </main>
 
     <footer class="footer">
-        <p>Спасибо за вайбкодинг в тг @vnvax</p>
+        <p>Спасибо автору в тг @vnvax</p>
     </footer>
 
     <div class="toast-container" id="toastContainer"></div>
@@ -408,7 +408,7 @@
                     }
                 });
 
-                // Сортируем слоги внутри группы
+                // Сортируем слоги внутри группы по алфавиту
                 vowels.forEach(v => {
                     syllableGroups[v].sort((a, b) => a.localeCompare(b, 'ru', { sensitivity: 'base' }));
                 });
@@ -455,7 +455,6 @@
                 localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
             });
 
-            // Функция отображения
             function renderGrid() {
                 grid.innerHTML = '';
                 let items;
@@ -515,7 +514,6 @@
                 }
                 saveLearnedSet(learnedSet);
                 card.classList.toggle('learned', learnedSet.has(syllable));
-                // Если включено скрытие, карточка скроется автоматически (CSS)
             }
 
             function showToast(message, type = 'info') {
@@ -579,12 +577,8 @@
                 btn.addEventListener('click', () => {
                     const mode = btn.dataset.mode;
                     if (btn.id === 'hideLearnedBtn') return; // обработаем отдельно
-                    if (mode === currentMode && mode !== 'random') return;
                     if (mode === 'random') {
-                        if (currentMode !== 'random') {
-                            currentMode = 'random';
-                            randomItems = [];
-                        }
+                        currentMode = 'random';
                         generateRandomItems();
                     } else {
                         currentMode = mode;
