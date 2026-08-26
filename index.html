@@ -492,6 +492,61 @@
             animation: fadeIn 0.3s ease;
         }
 
+        /* Кнопка "Далее" */
+        .exam-next-btn {
+            display: none;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 56px;
+            height: 56px;
+            cursor: pointer;
+            font-size: 2rem;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            animation: pulse 1.5s infinite;
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+        .exam-next-btn.show {
+            display: flex;
+        }
+        .exam-next-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 18px var(--accent-glow);
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 var(--accent-glow); }
+            70% { box-shadow: 0 0 0 15px rgba(0,0,0,0); }
+            100% { box-shadow: 0 0 0 0 rgba(0,0,0,0); }
+        }
+
+        /* Кнопка выхода */
+        .exam-exit-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            z-index: 10;
+        }
+        .exam-exit-btn:hover {
+            border-color: var(--danger);
+            color: var(--danger);
+            box-shadow: 0 0 10px var(--danger-glow);
+        }
+
         /* Окно с гифкой */
         .celebration-overlay {
             position: fixed;
@@ -646,12 +701,14 @@
 
     <!-- Экзаменационный оверлей -->
     <div class="exam-overlay" id="examOverlay">
+        <button class="exam-exit-btn" id="examExitBtn" title="Выйти">✕</button>
         <div class="exam-header">
             <div class="exam-question" id="examQuestion"></div>
             <button class="exam-repeat-btn" id="examRepeatBtn" title="Повторить звук">🔊</button>
         </div>
         <div class="exam-options" id="examOptions"></div>
         <div class="exam-result" id="examResult"></div>
+        <button class="exam-next-btn" id="examNextBtn" title="Далее">→</button>
     </div>
 
     <!-- Окно с гифкой -->
@@ -709,7 +766,7 @@
                 return a.localeCompare(b, 'ru', { sensitivity: 'base' });
             });
 
-            // DOM элементы (те же, что и раньше)
+            // DOM элементы
             const grid = document.getElementById('syllableGrid');
             const toastContainer = document.getElementById('toastContainer');
             const themeToggle = document.getElementById('themeToggle');
@@ -726,6 +783,8 @@
             const examOptions = document.getElementById('examOptions');
             const examResult = document.getElementById('examResult');
             const examRepeatBtn = document.getElementById('examRepeatBtn');
+            const examNextBtn = document.getElementById('examNextBtn');
+            const examExitBtn = document.getElementById('examExitBtn');
             const themePaletteTrigger = document.getElementById('themePaletteTrigger');
             const themePaletteDropdown = document.getElementById('themePaletteDropdown');
             const currentThemeDot = document.getElementById('currentThemeDot');
@@ -899,6 +958,7 @@
             examBtn.addEventListener('click', startExam);
             function startExam() {
                 examOverlay.classList.add('show');
+                examNextBtn.classList.remove('show');
                 examQuestions = getRandomExamQuestions(10);
                 examIndex = 0;
                 examScore = 0;
@@ -922,8 +982,9 @@
                 currentExamCorrect = correct;
                 examQuestion.textContent = `Вопрос ${examIndex+1} из ${examQuestions.length}`;
                 examResult.textContent = '';
+                examNextBtn.classList.remove('show'); // скрываем кнопку до ответа
                 const variants = new Set([correct]);
-                while (variants.size < 6) {   // <-- теперь 6 вариантов
+                while (variants.size < 6) {
                     const randomItem = syllables[Math.floor(Math.random() * syllables.length)];
                     if (!variants.has(randomItem)) variants.add(randomItem);
                 }
@@ -952,11 +1013,28 @@
                     });
                     examResult.textContent = '❌';
                 }
-                setTimeout(() => {
-                    examIndex++;
-                    showNextExamQuestion();
-                }, 1500);
+                // Показываем кнопку "Далее"
+                examNextBtn.classList.add('show');
+                examNextBtn.focus();
             }
+            // Обработчик кнопки "Далее"
+            examNextBtn.addEventListener('click', () => {
+                examIndex++;
+                showNextExamQuestion();
+            });
+            // Кнопка выхода
+            examExitBtn.addEventListener('click', () => {
+                examOverlay.classList.remove('show');
+                // Останавливаем звук, если играет
+                if (currentAudio) {
+                    currentAudio.pause();
+                    currentAudio.src = '';
+                    currentAudio = null;
+                }
+                examNextBtn.classList.remove('show');
+                showToast('Экзамен прерван', 'info');
+            });
+            // Повтор звука
             examRepeatBtn.addEventListener('click', () => {
                 if (currentExamCorrect) playAudio(currentExamCorrect);
             });
