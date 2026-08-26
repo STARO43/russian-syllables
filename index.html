@@ -118,23 +118,24 @@
             font-weight: 500;
         }
 
-        /* Выпадающая палитра тем */
+        /* Палитра тем слева */
         .theme-palette-wrapper {
-            position: relative;
-            display: inline-block;
-            margin-top: 8px;
-            cursor: pointer;
+            position: absolute;
+            top: 12px;
+            left: 16px;
         }
         .theme-palette-trigger {
             display: flex;
             align-items: center;
-            gap: 4px;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 4px 8px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
             transition: var(--transition);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
         }
         .theme-palette-trigger:hover {
             border-color: var(--accent);
@@ -143,8 +144,7 @@
         .theme-palette-dropdown {
             position: absolute;
             top: 100%;
-            left: 50%;
-            transform: translateX(-50%);
+            left: 0;
             display: none;
             flex-direction: column;
             gap: 6px;
@@ -385,7 +385,7 @@
             color: var(--accent);
         }
 
-        /* Экзамен */
+        /* Экзамен с анимациями */
         .exam-overlay {
             position: fixed;
             top: 0;
@@ -403,11 +403,21 @@
         }
         .exam-overlay.show {
             display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         .exam-header {
             display: flex;
             align-items: center;
             gap: 15px;
+            animation: slideDown 0.4s ease;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .exam-question {
             font-size: 1.3rem;
@@ -439,6 +449,11 @@
             gap: 10px;
             max-width: 500px;
             width: 100%;
+            animation: scaleIn 0.5s ease;
+        }
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
         }
         .exam-option {
             padding: 12px;
@@ -470,6 +485,7 @@
             font-size: 2rem;
             text-align: center;
             min-height: 2rem;
+            animation: fadeIn 0.3s ease;
         }
 
         /* Окно с гифкой */
@@ -487,6 +503,7 @@
         }
         .celebration-overlay.show {
             display: flex;
+            animation: fadeIn 0.3s ease;
         }
         .celebration-box {
             background: var(--bg-card);
@@ -495,6 +512,11 @@
             text-align: center;
             max-width: 90vw;
             max-height: 90vh;
+            animation: scaleIn 0.4s ease;
+        }
+        .celebration-box h2 {
+            margin-bottom: 10px;
+            font-size: 1.5rem;
         }
         .celebration-box img {
             max-width: 300px;
@@ -563,24 +585,20 @@
             .controls button { width: 38px; height: 38px; font-size: 1.1rem; }
             .theme-toggle { top: 6px; right: 10px; }
             .theme-toggle button { width: 32px; height: 32px; font-size: 1rem; }
-            .header { padding: 16px 12px 10px; }
+            .theme-palette-wrapper { top: 6px; left: 10px; }
+            .theme-palette-trigger { width: 32px; height: 32px; }
             .theme-palette-dropdown { flex-direction: row; flex-wrap: wrap; }
+            .header { padding: 16px 12px 10px; }
         }
     </style>
 </head>
 <body>
 
     <header class="header">
-        <div class="theme-toggle">
-            <button id="themeToggle" data-tooltip="Темно или светло">🌓</button>
-        </div>
-        <h1>Грамотиньо</h1>
-        <p>Жми, слушай, запоминай</p>
-        <!-- Палитра с выпадающим списком -->
+        <!-- Палитра тем слева -->
         <div class="theme-palette-wrapper">
             <div class="theme-palette-trigger" id="themePaletteTrigger">
                 <span id="currentThemeDot" class="color-dot" style="background: #4da3ff;"></span>
-                <span>🎨</span>
             </div>
             <div class="theme-palette-dropdown" id="themePaletteDropdown">
                 <div class="color-dot" data-theme="theme-blue" style="background:#4da3ff;" title="Синяя"></div>
@@ -595,6 +613,12 @@
                 <div class="color-dot" data-theme="theme-indigo" style="background:#818cf8;" title="Индиго"></div>
             </div>
         </div>
+
+        <div class="theme-toggle">
+            <button id="themeToggle" data-tooltip="Темно или светло">🌓</button>
+        </div>
+        <h1>Грамотиньо</h1>
+        <p>Жми, слушай, запоминай</p>
     </header>
 
     <div class="progress-container">
@@ -629,7 +653,7 @@
     <!-- Окно с гифкой -->
     <div class="celebration-overlay" id="celebrationOverlay">
         <div class="celebration-box">
-            <h2>🎉 Поздравляем! 🎉</h2>
+            <h2>Идеально! Умница!</h2>
             <img id="celebrationGif" src="" alt="Победа">
             <button class="celebration-close" id="celebrationClose">Закрыть</button>
         </div>
@@ -731,12 +755,10 @@
                     document.body.classList.add('light-mode');
                 }
                 localStorage.setItem('accentTheme', themeClass);
-                // Обновляем точку-триггер
                 const activeDot = document.querySelector(`.theme-palette-dropdown .color-dot[data-theme="${themeClass}"]`);
                 if (activeDot) {
                     currentThemeDot.style.background = activeDot.style.background;
                 }
-                // Подсвечиваем активную тему в списке
                 document.querySelectorAll('.color-dot').forEach(dot => {
                     dot.classList.toggle('active', dot.dataset.theme === themeClass);
                 });
@@ -753,7 +775,6 @@
                 localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
             });
 
-            // Обработка кликов по кружкам темы (внутри dropdown)
             document.querySelectorAll('.theme-palette-dropdown .color-dot').forEach(dot => {
                 dot.addEventListener('click', () => {
                     applyTheme(dot.dataset.theme);
@@ -912,6 +933,7 @@
                     btn.addEventListener('click', () => handleExamAnswer(btn, variant, correct));
                     examOptions.appendChild(btn);
                 });
+                // Анимация появления уже задана через CSS
                 playAudio(correct);
             }
             function handleExamAnswer(btn, selected, correct) {
