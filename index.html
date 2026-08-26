@@ -107,7 +107,7 @@
             font-weight: 500;
         }
 
-        /* Новый блок кнопок */
+        /* Панель управления */
         .controls {
             display: flex;
             justify-content: center;
@@ -199,7 +199,6 @@
             grid-template-columns: repeat(4, 1fr);
             gap: 10px;
         }
-        /* Скрытие изученных */
         .syllable-grid.hide-learned .syllable-card.learned {
             display: none;
         }
@@ -359,8 +358,9 @@
         <p>Жми, слушай, запоминай</p>
     </header>
 
-    <!-- Новые кнопки -->
+    <!-- Кнопки управления -->
     <div class="controls">
+        <button id="normalBtn" class="active" data-tooltip="Обычный режим">😱</button>
         <button id="randomBtn" data-tooltip="Случайные 10">🎲</button>
         <button id="hideLearnedBtn" data-tooltip="Скрыть отмеченные">✂</button>
     </div>
@@ -377,7 +377,7 @@
 
     <script>
         (function() {
-            // Массив слогов и слов (НЕ ИЗМЕНЯТЬ)
+            // Исходный массив (без изменений)
             const rawItems = [
                 'ЁЖ', 'ёлка', 'ЁН', 'АБ', 'АВ', 'АГ', 'АД', 'АЖ', 'АЗ', 'АК', 'АЛ', 'Алла', 'АМ', 'АН', 'Анна', 'АП', 'арка', 'арфа', 'АС', 'АТ', 'АХ', 'АЧ', 'АШ',
                 'БА', 'БАК', 'БАЯН', 'БЕ', 'БИ', 'БО', 'БОК', 'БОР', 'Боря', 'БЫ', 'БЫК', 'БЭ', 'БЮ', 'БЯ',
@@ -409,7 +409,7 @@
                 'юбка', 'ЮГ', 'юнга', 'ЯБ', 'ЯВ', 'ЯГ', 'ЯД', 'ЯК', 'ЯЛ', 'ЯМ', 'ЯН', 'ЯП', 'ЯР', 'ЯС', 'ЯТ', 'ЯХ', 'яхта', 'ЯЦ'
             ];
 
-            // Сортировка как раньше: длина, алфавит
+            // Сортировка: длина, алфавит
             const syllables = rawItems.sort((a, b) => {
                 const lenDiff = a.length - b.length;
                 if (lenDiff !== 0) return lenDiff;
@@ -419,16 +419,16 @@
             const grid = document.getElementById('syllableGrid');
             const toastContainer = document.getElementById('toastContainer');
             const themeToggle = document.getElementById('themeToggle');
+            const normalBtn = document.getElementById('normalBtn');
             const randomBtn = document.getElementById('randomBtn');
             const hideLearnedBtn = document.getElementById('hideLearnedBtn');
 
-            let currentMode = 'all';       // 'all' или 'random'
-            let randomItems = [];          // текущие случайные элементы
+            let currentMode = 'all';        // 'all' или 'random'
+            let randomItems = [];
 
             let currentAudio = null;
             let isPlaying = false;
 
-            // Изученные по тексту
             function loadLearnedSet() {
                 try {
                     return new Set(JSON.parse(localStorage.getItem('learned_syllables') || '[]'));
@@ -439,20 +439,17 @@
             }
             let learnedSet = loadLearnedSet();
 
-            // Тема
             if (localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
             themeToggle.addEventListener('click', () => {
                 document.body.classList.toggle('light-mode');
                 localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
             });
 
-            // Генерация 10 случайных
             function generateRandomItems() {
                 const shuffled = syllables.slice().sort(() => Math.random() - 0.5);
                 randomItems = shuffled.slice(0, Math.min(10, shuffled.length));
             }
 
-            // Рендер
             function renderGrid() {
                 grid.innerHTML = '';
                 const items = currentMode === 'random' ? randomItems : syllables;
@@ -557,36 +554,28 @@
                 });
             }
 
-            // Кнопка "Случайные"
-            randomBtn.addEventListener('click', () => {
-                if (currentMode === 'random') {
-                    // просто обновить случайные
-                    generateRandomItems();
-                } else {
-                    currentMode = 'random';
-                    generateRandomItems();
-                    randomBtn.classList.add('active');
-                }
+            // Обработчики
+            normalBtn.addEventListener('click', () => {
+                currentMode = 'all';
+                normalBtn.classList.add('active');
+                randomBtn.classList.remove('active');
                 renderGrid();
             });
 
-            // Кнопка "Скрыть изученные"
+            randomBtn.addEventListener('click', () => {
+                currentMode = 'random';
+                generateRandomItems();
+                randomBtn.classList.add('active');
+                normalBtn.classList.remove('active');
+                renderGrid();
+            });
+
             hideLearnedBtn.addEventListener('click', () => {
                 hideLearnedBtn.classList.toggle('active');
                 grid.classList.toggle('hide-learned', hideLearnedBtn.classList.contains('active'));
             });
 
-            // Возможность вернуться к полному списку при двойном клике на кнопку? 
-            // По ТЗ не требуется, оставим как есть. Но можно сделать: повторный клик при active отключает режим.
-            randomBtn.addEventListener('dblclick', () => {
-                if (currentMode === 'random') {
-                    currentMode = 'all';
-                    randomBtn.classList.remove('active');
-                    renderGrid();
-                }
-            });
-
-            // Первый рендер
+            // Старт
             renderGrid();
         })();
     </script>
