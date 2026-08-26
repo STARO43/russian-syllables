@@ -364,17 +364,31 @@
         }
 
         /* Адаптивность */
-        @media (max-width: 1024px) {
-            .syllable-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-        }
-        @media (max-width: 600px) {
-            .syllable-grid { grid-template-columns: repeat(2, 1fr); gap: 5px; }
-            .syllable-card { font-size: 1rem; padding: 12px 4px; min-height: 50px; }
-            .learn-dot { width: 12px; height: 12px; bottom: 4px; right: 4px; }
-            .controls { gap: 6px; }
-            .controls button { width: 40px; height: 40px; font-size: 1.1rem; }
-            .controls button::after { font-size: 0.7rem; padding: 4px 8px; }
-        }
+       @media (max-width: 1024px) {
+    .syllable-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+}
+@media (max-width: 600px) {
+    .syllable-grid { grid-template-columns: repeat(2, 1fr); gap: 5px; }
+    .syllable-card { font-size: 1rem; padding: 12px 4px; min-height: 50px; }
+    .learn-dot { width: 12px; height: 12px; bottom: 4px; right: 4px; }
+    .controls { gap: 6px; }
+    .controls button { width: 40px; height: 40px; font-size: 1.1rem; }
+    .controls button::after { font-size: 0.7rem; padding: 4px 8px; }
+
+    /* Исправление наложения кнопки темы */
+    .theme-toggle {
+        top: 8px;
+        right: 8px;
+    }
+    .theme-toggle button {
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+    }
+    .header {
+        padding: 40px 16px 12px;
+    }
+}
     </style>
 </head>
 <body>
