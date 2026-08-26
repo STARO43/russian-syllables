@@ -27,7 +27,6 @@
             --font: 'PT Serif', serif;
         }
 
-        /* Светлая тема */
         body.light-mode {
             --bg: #f5f7fa;
             --bg-card: #ffffff;
@@ -43,11 +42,7 @@
             --danger-glow: rgba(217, 56, 46, 0.15);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             background: var(--bg);
@@ -88,7 +83,7 @@
             align-items: center;
             justify-content: center;
             transition: var(--transition);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
         .theme-toggle button:hover {
             border-color: var(--accent);
@@ -112,6 +107,86 @@
             font-weight: 500;
         }
 
+        /* Новый блок кнопок */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px 20px;
+            flex-wrap: wrap;
+        }
+        .controls button {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            cursor: pointer;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+            position: relative;
+        }
+        .controls button:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            box-shadow: 0 0 16px var(--accent-glow);
+            transform: translateY(-2px);
+        }
+        .controls button.active {
+            background: var(--accent-glow);
+            border-color: var(--accent);
+            color: var(--accent);
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+        /* Тултипы */
+        .controls button::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%) translateY(5px);
+            background: var(--bg-card);
+            color: var(--text);
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            pointer-events: none;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease, transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.2s;
+            z-index: 10;
+        }
+        .controls button::before {
+            content: '';
+            position: absolute;
+            bottom: calc(100% + 2px);
+            left: 50%;
+            transform: translateX(-50%) translateY(5px);
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 5px solid var(--bg-card);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease, transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.2s;
+            z-index: 11;
+        }
+        .controls button:hover::after,
+        .controls button:hover::before {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
         .grid-container {
             max-width: 900px;
             margin: 0 auto;
@@ -123,6 +198,10 @@
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 10px;
+        }
+        /* Скрытие изученных */
+        .syllable-grid.hide-learned .syllable-card.learned {
+            display: none;
         }
 
         .syllable-card {
@@ -257,63 +336,48 @@
             border-top: 1px solid var(--border);
         }
 
-        /* Адаптивность */
         @media (max-width: 900px) {
-            .syllable-grid {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 8px;
-            }
+            .syllable-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
         }
         @media (max-width: 600px) {
-            .syllable-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 5px;
-            }
-            .syllable-card {
-                font-size: 1rem;
-                padding: 12px 4px;
-                border-radius: 8px;
-                min-height: 50px;
-            }
-            .learn-dot {
-                width: 12px;
-                height: 12px;
-                bottom: 4px;
-                right: 4px;
-            }
-            .header {
-                padding: 24px 16px 12px;
-            }
-            .grid-container {
-                padding: 12px 12px 32px;
-            }
+            .syllable-grid { grid-template-columns: repeat(2, 1fr); gap: 5px; }
+            .syllable-card { font-size: 1rem; padding: 12px 4px; min-height: 50px; }
+            .learn-dot { width: 12px; height: 12px; bottom: 4px; right: 4px; }
+            .controls { gap: 6px; }
+            .controls button { width: 40px; height: 40px; font-size: 1.1rem; }
+            .controls button::after { font-size: 0.7rem; padding: 4px 8px; }
         }
-        /* Убрали блок с max-width:400px, чтобы всегда было по две колонки */
     </style>
 </head>
 <body>
 
     <header class="header">
         <div class="theme-toggle">
-            <button id="themeToggle" title="Переключить тему">🌓</button>
+            <button id="themeToggle" data-tooltip="Темно или светло">🌓</button>
         </div>
         <h1>Грамотиньо</h1>
         <p>Жми, слушай, запоминай</p>
     </header>
+
+    <!-- Новые кнопки -->
+    <div class="controls">
+        <button id="randomBtn" data-tooltip="Случайные 10">🎲</button>
+        <button id="hideLearnedBtn" data-tooltip="Скрыть отмеченные">✂</button>
+    </div>
 
     <main class="grid-container">
         <div class="syllable-grid" id="syllableGrid"></div>
     </main>
 
     <footer class="footer">
-        <p>Спасибо автору в тг @vnvax</p>
+        <p>Спасибо за вайбкодинг в тегешечку @vnvax</p>
     </footer>
 
     <div class="toast-container" id="toastContainer"></div>
 
     <script>
         (function() {
-            // Удалены слоги: "ЁТ", "ИЦ", "ГЁ", "ВЁ", "БЁ", "ИГ"
+            // Массив слогов и слов (НЕ ИЗМЕНЯТЬ)
             const rawItems = [
                 'ЁЖ', 'ёлка', 'ЁН', 'АБ', 'АВ', 'АГ', 'АД', 'АЖ', 'АЗ', 'АК', 'АЛ', 'Алла', 'АМ', 'АН', 'Анна', 'АП', 'арка', 'арфа', 'АС', 'АТ', 'АХ', 'АЧ', 'АШ',
                 'БА', 'БАК', 'БАЯН', 'БЕ', 'БИ', 'БО', 'БОК', 'БОР', 'Боря', 'БЫ', 'БЫК', 'БЭ', 'БЮ', 'БЯ',
@@ -345,7 +409,7 @@
                 'юбка', 'ЮГ', 'юнга', 'ЯБ', 'ЯВ', 'ЯГ', 'ЯД', 'ЯК', 'ЯЛ', 'ЯМ', 'ЯН', 'ЯП', 'ЯР', 'ЯС', 'ЯТ', 'ЯХ', 'яхта', 'ЯЦ'
             ];
 
-            // Сортировка: по длине, затем по алфавиту
+            // Сортировка как раньше: длина, алфавит
             const syllables = rawItems.sort((a, b) => {
                 const lenDiff = a.length - b.length;
                 if (lenDiff !== 0) return lenDiff;
@@ -355,45 +419,47 @@
             const grid = document.getElementById('syllableGrid');
             const toastContainer = document.getElementById('toastContainer');
             const themeToggle = document.getElementById('themeToggle');
+            const randomBtn = document.getElementById('randomBtn');
+            const hideLearnedBtn = document.getElementById('hideLearnedBtn');
 
-            // Инициализация темы
-            if (localStorage.getItem('theme') === 'light') {
-                document.body.classList.add('light-mode');
+            let currentMode = 'all';       // 'all' или 'random'
+            let randomItems = [];          // текущие случайные элементы
+
+            let currentAudio = null;
+            let isPlaying = false;
+
+            // Изученные по тексту
+            function loadLearnedSet() {
+                try {
+                    return new Set(JSON.parse(localStorage.getItem('learned_syllables') || '[]'));
+                } catch { return new Set(); }
             }
+            function saveLearnedSet(set) {
+                localStorage.setItem('learned_syllables', JSON.stringify(Array.from(set)));
+            }
+            let learnedSet = loadLearnedSet();
+
+            // Тема
+            if (localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
             themeToggle.addEventListener('click', () => {
                 document.body.classList.toggle('light-mode');
                 localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
             });
 
-            let currentAudio = null;
-            let activeCardIndex = null;
-            let isPlaying = false;
-
-            function loadLearnedSet() {
-                try {
-                    const data = localStorage.getItem('learned_syllables');
-                    return new Set(data ? JSON.parse(data) : []);
-                } catch (e) {
-                    return new Set();
-                }
+            // Генерация 10 случайных
+            function generateRandomItems() {
+                const shuffled = syllables.slice().sort(() => Math.random() - 0.5);
+                randomItems = shuffled.slice(0, Math.min(10, shuffled.length));
             }
 
-            function saveLearnedSet(set) {
-                try {
-                    localStorage.setItem('learned_syllables', JSON.stringify(Array.from(set)));
-                } catch (e) {
-                    console.warn('Не удалось сохранить отметки');
-                }
-            }
-
-            let learnedSet = loadLearnedSet();
-
+            // Рендер
             function renderGrid() {
                 grid.innerHTML = '';
-                syllables.forEach((syllable, index) => {
+                const items = currentMode === 'random' ? randomItems : syllables;
+
+                items.forEach((syllable) => {
                     const card = document.createElement('div');
                     card.className = 'syllable-card';
-                    card.dataset.index = index;
                     card.dataset.syllable = syllable;
                     card.setAttribute('role', 'button');
                     card.setAttribute('tabindex', '0');
@@ -408,23 +474,21 @@
                     dot.className = 'learn-dot';
                     dot.title = 'Отметить';
                     dot.setAttribute('role', 'checkbox');
-                    dot.setAttribute('aria-checked', learnedSet.has(index));
+                    dot.setAttribute('aria-checked', learnedSet.has(syllable));
                     card.appendChild(dot);
 
-                    if (learnedSet.has(index)) {
-                        card.classList.add('learned');
-                    }
+                    if (learnedSet.has(syllable)) card.classList.add('learned');
 
                     dot.addEventListener('click', (e) => {
                         e.stopPropagation();
-                        toggleLearned(index);
+                        toggleLearned(syllable, card);
                     });
 
-                    card.addEventListener('click', () => handleSyllableClick(index));
+                    card.addEventListener('click', () => handleSyllableClick(syllable, card));
                     card.addEventListener('keydown', (e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
                             e.preventDefault();
-                            handleSyllableClick(index);
+                            handleSyllableClick(syllable, card);
                         }
                     });
 
@@ -432,19 +496,14 @@
                 });
             }
 
-            function toggleLearned(index) {
-                if (learnedSet.has(index)) {
-                    learnedSet.delete(index);
+            function toggleLearned(syllable, card) {
+                if (learnedSet.has(syllable)) {
+                    learnedSet.delete(syllable);
                 } else {
-                    learnedSet.add(index);
+                    learnedSet.add(syllable);
                 }
                 saveLearnedSet(learnedSet);
-                const cards = document.querySelectorAll('.syllable-card');
-                const card = cards[index];
-                if (card) {
-                    card.classList.toggle('learned', learnedSet.has(index));
-                }
-                showToast(learnedSet.has(index) ? '✓' : '(:', 'success');
+                card.classList.toggle('learned', learnedSet.has(syllable));
             }
 
             function showToast(message, type = 'info') {
@@ -458,11 +517,8 @@
             }
 
             function clearPlayingState() {
-                document.querySelectorAll('.syllable-card').forEach(card => {
-                    card.classList.remove('playing');
-                });
+                document.querySelectorAll('.syllable-card.playing').forEach(c => c.classList.remove('playing'));
                 isPlaying = false;
-                activeCardIndex = null;
                 currentAudio = null;
             }
 
@@ -475,50 +531,63 @@
                 clearPlayingState();
             }
 
-            function handleSyllableClick(index) {
-                const syllable = syllables[index];
+            function handleSyllableClick(syllable, card) {
                 stopAudio();
-
-                activeCardIndex = index;
-                const cards = document.querySelectorAll('.syllable-card');
-                if (cards[index]) cards[index].classList.add('playing');
+                card.classList.add('playing');
                 isPlaying = true;
 
                 const audio = new Audio('audio/' + syllable + '.mp3');
                 audio.volume = 1;
                 currentAudio = audio;
 
-                audio.addEventListener('ended', () => {
+                audio.addEventListener('ended', clearPlayingState);
+                audio.addEventListener('error', () => {
                     clearPlayingState();
-                });
-
-                audio.addEventListener('error', (e) => {
-                    console.error('Ошибка загрузки аудио:', e);
-                    clearPlayingState();
-                    if (cards[index]) {
-                        cards[index].classList.add('error');
-                        setTimeout(() => cards[index].classList.remove('error'), 1000);
-                    }
+                    card.classList.add('error');
+                    setTimeout(() => card.classList.remove('error'), 1000);
                     showToast('Не удалось загрузить аудио', 'error');
                 });
-
                 audio.play().catch(err => {
-                    if (err.name === 'AbortError') {
-                        console.log('Воспроизведение прервано');
-                    } else {
-                        console.error('Ошибка воспроизведения:', err);
+                    if (err.name !== 'AbortError') {
                         clearPlayingState();
-                        if (cards[index]) {
-                            cards[index].classList.add('error');
-                            setTimeout(() => cards[index].classList.remove('error'), 1000);
-                        }
+                        card.classList.add('error');
+                        setTimeout(() => card.classList.remove('error'), 1000);
                         showToast('Ошибка воспроизведения', 'error');
                     }
                 });
             }
 
+            // Кнопка "Случайные"
+            randomBtn.addEventListener('click', () => {
+                if (currentMode === 'random') {
+                    // просто обновить случайные
+                    generateRandomItems();
+                } else {
+                    currentMode = 'random';
+                    generateRandomItems();
+                    randomBtn.classList.add('active');
+                }
+                renderGrid();
+            });
+
+            // Кнопка "Скрыть изученные"
+            hideLearnedBtn.addEventListener('click', () => {
+                hideLearnedBtn.classList.toggle('active');
+                grid.classList.toggle('hide-learned', hideLearnedBtn.classList.contains('active'));
+            });
+
+            // Возможность вернуться к полному списку при двойном клике на кнопку? 
+            // По ТЗ не требуется, оставим как есть. Но можно сделать: повторный клик при active отключает режим.
+            randomBtn.addEventListener('dblclick', () => {
+                if (currentMode === 'random') {
+                    currentMode = 'all';
+                    randomBtn.classList.remove('active');
+                    renderGrid();
+                }
+            });
+
+            // Первый рендер
             renderGrid();
-            console.log(`🔤 Загружено ${syllables.length} элементов`);
         })();
     </script>
 </body>
