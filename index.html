@@ -631,7 +631,7 @@
         <button id="randomBtn" data-tooltip="Случайно">🎲</button>
         <button id="hideLearnedBtn" data-tooltip="Скрыть/показать">✂</button>
         <button id="clearLearnedBtn" data-tooltip="Очистить">☑</button>
-        <button id="examBtn" data-tooltip="Экзамен">📝</button>
+        <button id="examBtn" data-tooltip="Проверка">🏆</button>
     </div>
 
     <main class="grid-container">
@@ -667,10 +667,10 @@
 
     <script>
         (function() {
-            // Исходный массив
+            // Исходный массив (без "БЮ")
             const rawItems = [
                 'ЁЖ', 'ёлка', 'ЁН', 'АБ', 'АВ', 'АГ', 'АД', 'АЖ', 'АЗ', 'АК', 'АЛ', 'Алла', 'АМ', 'АН', 'Анна', 'АП', 'арка', 'арфа', 'АС', 'АТ', 'АХ', 'АЧ', 'АШ',
-                'БА', 'БАК', 'БАЯН', 'БЕ', 'БИ', 'БО', 'БОК', 'БОР', 'Боря', 'БЫ', 'БЫК', 'БЭ', 'БЮ', 'БЯ',
+                'БА', 'БАК', 'БАЯН', 'БЕ', 'БИ', 'БО', 'БОК', 'БОР', 'Боря', 'БЫ', 'БЫК', 'БЭ', 'БЯ',
                 'ВА', 'Валя', 'ВЕ', 'ВЕЕР', 'ВИ', 'Витя', 'Вова', 'ВОЗ', 'ВОЛ', 'ВОЛК', 'ВУ', 'ВЫ', 'ВЭ', 'ВЮ',
                 'ГА', 'ГАЗ', 'Галя', 'ГЕ', 'Гена', 'ГИ', 'ГО', 'ГОД', 'ГЫ', 'ГЭ',
                 'ДА', 'ДИ', 'ДОМ', 'ДУ', 'ДУБ', 'ДУШ', 'ДЫ', 'ДЫМ', 'ДЭ', 'ДЮ', 'ДЯ',
@@ -705,7 +705,7 @@
                 return a.localeCompare(b, 'ru', { sensitivity: 'base' });
             });
 
-            // DOM
+            // DOM элементы (те же, что и раньше)
             const grid = document.getElementById('syllableGrid');
             const toastContainer = document.getElementById('toastContainer');
             const themeToggle = document.getElementById('themeToggle');
@@ -781,7 +781,6 @@
                 });
             });
 
-            // Кнопка наверх
             window.addEventListener('scroll', () => {
                 scrollTopBtn.classList.toggle('visible', window.scrollY > 300);
             });
@@ -920,7 +919,7 @@
                 examQuestion.textContent = `Вопрос ${examIndex+1} из ${examQuestions.length}`;
                 examResult.textContent = '';
                 const variants = new Set([correct]);
-                while (variants.size < 5) {
+                while (variants.size < 6) {   // <-- теперь 6 вариантов
                     const randomItem = syllables[Math.floor(Math.random() * syllables.length)];
                     if (!variants.has(randomItem)) variants.add(randomItem);
                 }
@@ -933,7 +932,6 @@
                     btn.addEventListener('click', () => handleExamAnswer(btn, variant, correct));
                     examOptions.appendChild(btn);
                 });
-                // Анимация появления уже задана через CSS
                 playAudio(correct);
             }
             function handleExamAnswer(btn, selected, correct) {
