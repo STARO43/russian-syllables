@@ -118,60 +118,30 @@
             font-weight: 500;
         }
 
-        /* Палитра тем слева */
-        .theme-palette-wrapper {
+        /* Новая вертикальная палитра тем */
+        .palette-strip {
             position: absolute;
             top: 12px;
             left: 16px;
-        }
-        .theme-palette-trigger {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 36px;
-            height: 36px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 50%;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            transition: var(--transition);
-        }
-        .theme-palette-trigger:hover {
-            border-color: var(--accent);
-            box-shadow: 0 0 10px var(--accent-glow);
-        }
-        .theme-palette-dropdown {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            display: none;
             flex-direction: column;
             gap: 6px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 8px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-            z-index: 20;
         }
-        .theme-palette-wrapper:hover .theme-palette-dropdown {
-            display: flex;
-        }
-        .color-dot {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
+        .palette-strip .color-strip {
+            width: 10px;
+            height: 28px;
+            border-radius: 5px;
             cursor: pointer;
-            border: 2px solid transparent;
-            transition: transform 0.2s;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid transparent;
         }
-        .color-dot:hover {
+        .palette-strip .color-strip:hover {
             transform: scale(1.2);
         }
-        .color-dot.active {
+        .palette-strip .color-strip.active {
             border-color: var(--text);
-            box-shadow: 0 0 6px var(--accent-glow);
+            box-shadow: 0 0 8px var(--accent-glow);
+            transform: scale(1.1);
         }
 
         .progress-container {
@@ -644,9 +614,8 @@
             .controls button { width: 38px; height: 38px; font-size: 1.1rem; }
             .theme-toggle { top: 6px; right: 10px; }
             .theme-toggle button { width: 32px; height: 32px; font-size: 1rem; }
-            .theme-palette-wrapper { top: 6px; left: 10px; }
-            .theme-palette-trigger { width: 32px; height: 32px; }
-            .theme-palette-dropdown { flex-direction: row; flex-wrap: wrap; }
+            .palette-strip { top: 6px; left: 10px; }
+            .palette-strip .color-strip { width: 8px; height: 22px; }
             .header { padding: 16px 12px 10px; }
         }
     </style>
@@ -654,23 +623,18 @@
 <body>
 
     <header class="header">
-        <!-- Палитра тем слева -->
-        <div class="theme-palette-wrapper">
-            <div class="theme-palette-trigger" id="themePaletteTrigger">
-                <span id="currentThemeDot" class="color-dot" style="background: #4da3ff;"></span>
-            </div>
-            <div class="theme-palette-dropdown" id="themePaletteDropdown">
-                <div class="color-dot" data-theme="theme-blue" style="background:#4da3ff;" title="Синяя"></div>
-                <div class="color-dot" data-theme="theme-green" style="background:#4ade80;" title="Зелёная"></div>
-                <div class="color-dot" data-theme="theme-red" style="background:#f87171;" title="Красная"></div>
-                <div class="color-dot" data-theme="theme-orange" style="background:#fb923c;" title="Оранжевая"></div>
-                <div class="color-dot" data-theme="theme-purple" style="background:#c084fc;" title="Фиолетовая"></div>
-                <div class="color-dot" data-theme="theme-pink" style="background:#f472b6;" title="Розовая"></div>
-                <div class="color-dot" data-theme="theme-cyan" style="background:#22d3ee;" title="Голубая"></div>
-                <div class="color-dot" data-theme="theme-yellow" style="background:#facc15;" title="Жёлтая"></div>
-                <div class="color-dot" data-theme="theme-teal" style="background:#2dd4bf;" title="Бирюзовая"></div>
-                <div class="color-dot" data-theme="theme-indigo" style="background:#818cf8;" title="Индиго"></div>
-            </div>
+        <!-- Вертикальная палитра тем -->
+        <div class="palette-strip" id="paletteStrip">
+            <div class="color-strip" data-theme="theme-blue" style="background:#4da3ff;"></div>
+            <div class="color-strip" data-theme="theme-green" style="background:#4ade80;"></div>
+            <div class="color-strip" data-theme="theme-red" style="background:#f87171;"></div>
+            <div class="color-strip" data-theme="theme-orange" style="background:#fb923c;"></div>
+            <div class="color-strip" data-theme="theme-purple" style="background:#c084fc;"></div>
+            <div class="color-strip" data-theme="theme-pink" style="background:#f472b6;"></div>
+            <div class="color-strip" data-theme="theme-cyan" style="background:#22d3ee;"></div>
+            <div class="color-strip" data-theme="theme-yellow" style="background:#facc15;"></div>
+            <div class="color-strip" data-theme="theme-teal" style="background:#2dd4bf;"></div>
+            <div class="color-strip" data-theme="theme-indigo" style="background:#818cf8;"></div>
         </div>
 
         <div class="theme-toggle">
@@ -785,9 +749,7 @@
             const examRepeatBtn = document.getElementById('examRepeatBtn');
             const examNextBtn = document.getElementById('examNextBtn');
             const examExitBtn = document.getElementById('examExitBtn');
-            const themePaletteTrigger = document.getElementById('themePaletteTrigger');
-            const themePaletteDropdown = document.getElementById('themePaletteDropdown');
-            const currentThemeDot = document.getElementById('currentThemeDot');
+            const paletteStrip = document.getElementById('paletteStrip');
             const celebrationOverlay = document.getElementById('celebrationOverlay');
             const celebrationGif = document.getElementById('celebrationGif');
             const celebrationClose = document.getElementById('celebrationClose');
@@ -818,12 +780,8 @@
                     document.body.classList.add('light-mode');
                 }
                 localStorage.setItem('accentTheme', themeClass);
-                const activeDot = document.querySelector(`.theme-palette-dropdown .color-dot[data-theme="${themeClass}"]`);
-                if (activeDot) {
-                    currentThemeDot.style.background = activeDot.style.background;
-                }
-                document.querySelectorAll('.color-dot').forEach(dot => {
-                    dot.classList.toggle('active', dot.dataset.theme === themeClass);
+                document.querySelectorAll('.color-strip').forEach(strip => {
+                    strip.classList.toggle('active', strip.dataset.theme === themeClass);
                 });
             }
 
@@ -838,9 +796,10 @@
                 localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
             });
 
-            document.querySelectorAll('.theme-palette-dropdown .color-dot').forEach(dot => {
-                dot.addEventListener('click', () => {
-                    applyTheme(dot.dataset.theme);
+            // Обработчики для вертикальной палитры
+            document.querySelectorAll('.color-strip').forEach(strip => {
+                strip.addEventListener('click', () => {
+                    applyTheme(strip.dataset.theme);
                 });
             });
 
