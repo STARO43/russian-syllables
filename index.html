@@ -42,7 +42,6 @@
             --danger-glow: rgba(217, 56, 46, 0.15);
         }
 
-        /* Десять цветовых тем (меняют акцент и подсветку) */
         body.theme-blue   { --accent: #4da3ff; --accent-glow: rgba(77, 163, 255, 0.25); --learned: #3fb950; --learned-bg: rgba(63, 185, 80, 0.2); }
         body.theme-green  { --accent: #4ade80; --accent-glow: rgba(74, 222, 128, 0.25); --learned: #38bdf8; --learned-bg: rgba(56, 189, 248, 0.2); }
         body.theme-red    { --accent: #f87171; --accent-glow: rgba(248, 113, 113, 0.25); --learned: #a78bfa; --learned-bg: rgba(167, 139, 250, 0.2); }
@@ -97,6 +96,11 @@
             transition: var(--transition);
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
+        .theme-toggle button:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
 
         .header h1 {
             font-size: clamp(1.8rem, 5vw, 2.8rem);
@@ -114,25 +118,58 @@
             font-weight: 500;
         }
 
-        /* Палитра тем в шапке */
-        .theme-palette-header {
-            display: flex;
-            justify-content: center;
-            gap: 6px;
+        /* Выпадающая палитра тем */
+        .theme-palette-wrapper {
+            position: relative;
+            display: inline-block;
             margin-top: 8px;
+            cursor: pointer;
         }
-        .theme-palette-header .color-dot {
-            width: 20px;
-            height: 20px;
+        .theme-palette-trigger {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 4px 8px;
+            transition: var(--transition);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        .theme-palette-trigger:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+        .theme-palette-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 8px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            z-index: 20;
+        }
+        .theme-palette-wrapper:hover .theme-palette-dropdown {
+            display: flex;
+        }
+        .color-dot {
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             cursor: pointer;
             border: 2px solid transparent;
             transition: transform 0.2s;
         }
-        .theme-palette-header .color-dot:hover {
+        .color-dot:hover {
             transform: scale(1.2);
         }
-        .theme-palette-header .color-dot.active {
+        .color-dot.active {
             border-color: var(--text);
             box-shadow: 0 0 6px var(--accent-glow);
         }
@@ -430,10 +467,49 @@
             background: rgba(248,81,73,0.2);
         }
         .exam-result {
-            font-size: 1.2rem;
+            font-size: 2rem;
             text-align: center;
-            color: var(--text);
-            min-height: 1.5em;
+            min-height: 2rem;
+        }
+
+        /* Окно с гифкой */
+        .celebration-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .celebration-overlay.show {
+            display: flex;
+        }
+        .celebration-box {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 20px;
+            text-align: center;
+            max-width: 90vw;
+            max-height: 90vh;
+        }
+        .celebration-box img {
+            max-width: 300px;
+            max-height: 250px;
+            border-radius: 10px;
+        }
+        .celebration-close {
+            margin-top: 15px;
+            padding: 8px 20px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: var(--font);
         }
 
         .toast-container {
@@ -441,7 +517,7 @@
             bottom: 24px;
             left: 50%;
             transform: translateX(-50%);
-            z-index: 3000;
+            z-index: 4000;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -488,7 +564,7 @@
             .theme-toggle { top: 6px; right: 10px; }
             .theme-toggle button { width: 32px; height: 32px; font-size: 1rem; }
             .header { padding: 16px 12px 10px; }
-            .theme-palette-header .color-dot { width: 16px; height: 16px; }
+            .theme-palette-dropdown { flex-direction: row; flex-wrap: wrap; }
         }
     </style>
 </head>
@@ -500,18 +576,24 @@
         </div>
         <h1>Грамотиньо</h1>
         <p>Жми, слушай, запоминай</p>
-        <!-- Палитра тем в шапке -->
-        <div class="theme-palette-header" id="themePaletteHeader">
-            <div class="color-dot" data-theme="theme-blue" style="background:#4da3ff;" title="Синяя"></div>
-            <div class="color-dot" data-theme="theme-green" style="background:#4ade80;" title="Зелёная"></div>
-            <div class="color-dot" data-theme="theme-red" style="background:#f87171;" title="Красная"></div>
-            <div class="color-dot" data-theme="theme-orange" style="background:#fb923c;" title="Оранжевая"></div>
-            <div class="color-dot" data-theme="theme-purple" style="background:#c084fc;" title="Фиолетовая"></div>
-            <div class="color-dot" data-theme="theme-pink" style="background:#f472b6;" title="Розовая"></div>
-            <div class="color-dot" data-theme="theme-cyan" style="background:#22d3ee;" title="Голубая"></div>
-            <div class="color-dot" data-theme="theme-yellow" style="background:#facc15;" title="Жёлтая"></div>
-            <div class="color-dot" data-theme="theme-teal" style="background:#2dd4bf;" title="Бирюзовая"></div>
-            <div class="color-dot" data-theme="theme-indigo" style="background:#818cf8;" title="Индиго"></div>
+        <!-- Палитра с выпадающим списком -->
+        <div class="theme-palette-wrapper">
+            <div class="theme-palette-trigger" id="themePaletteTrigger">
+                <span id="currentThemeDot" class="color-dot" style="background: #4da3ff;"></span>
+                <span>🎨</span>
+            </div>
+            <div class="theme-palette-dropdown" id="themePaletteDropdown">
+                <div class="color-dot" data-theme="theme-blue" style="background:#4da3ff;" title="Синяя"></div>
+                <div class="color-dot" data-theme="theme-green" style="background:#4ade80;" title="Зелёная"></div>
+                <div class="color-dot" data-theme="theme-red" style="background:#f87171;" title="Красная"></div>
+                <div class="color-dot" data-theme="theme-orange" style="background:#fb923c;" title="Оранжевая"></div>
+                <div class="color-dot" data-theme="theme-purple" style="background:#c084fc;" title="Фиолетовая"></div>
+                <div class="color-dot" data-theme="theme-pink" style="background:#f472b6;" title="Розовая"></div>
+                <div class="color-dot" data-theme="theme-cyan" style="background:#22d3ee;" title="Голубая"></div>
+                <div class="color-dot" data-theme="theme-yellow" style="background:#facc15;" title="Жёлтая"></div>
+                <div class="color-dot" data-theme="theme-teal" style="background:#2dd4bf;" title="Бирюзовая"></div>
+                <div class="color-dot" data-theme="theme-indigo" style="background:#818cf8;" title="Индиго"></div>
+            </div>
         </div>
     </header>
 
@@ -544,6 +626,15 @@
         <div class="exam-result" id="examResult"></div>
     </div>
 
+    <!-- Окно с гифкой -->
+    <div class="celebration-overlay" id="celebrationOverlay">
+        <div class="celebration-box">
+            <h2>🎉 Поздравляем! 🎉</h2>
+            <img id="celebrationGif" src="" alt="Победа">
+            <button class="celebration-close" id="celebrationClose">Закрыть</button>
+        </div>
+    </div>
+
     <footer class="footer">
         <p>Спасибо за вайбкодинг в тегешечку @vnvax</p>
     </footer>
@@ -552,7 +643,7 @@
 
     <script>
         (function() {
-            // Массив слогов и слов
+            // Исходный массив
             const rawItems = [
                 'ЁЖ', 'ёлка', 'ЁН', 'АБ', 'АВ', 'АГ', 'АД', 'АЖ', 'АЗ', 'АК', 'АЛ', 'Алла', 'АМ', 'АН', 'Анна', 'АП', 'арка', 'арфа', 'АС', 'АТ', 'АХ', 'АЧ', 'АШ',
                 'БА', 'БАК', 'БАЯН', 'БЕ', 'БИ', 'БО', 'БОК', 'БОР', 'Боря', 'БЫ', 'БЫК', 'БЭ', 'БЮ', 'БЯ',
@@ -584,14 +675,13 @@
                 'юбка', 'ЮГ', 'юнга', 'ЯБ', 'ЯВ', 'ЯГ', 'ЯД', 'ЯК', 'ЯЛ', 'ЯМ', 'ЯН', 'ЯП', 'ЯР', 'ЯС', 'ЯТ', 'ЯХ', 'яхта', 'ЯЦ'
             ];
 
-            // Сортировка
             const syllables = rawItems.sort((a, b) => {
                 const lenDiff = a.length - b.length;
                 if (lenDiff !== 0) return lenDiff;
                 return a.localeCompare(b, 'ru', { sensitivity: 'base' });
             });
 
-            // DOM элементы
+            // DOM
             const grid = document.getElementById('syllableGrid');
             const toastContainer = document.getElementById('toastContainer');
             const themeToggle = document.getElementById('themeToggle');
@@ -608,13 +698,16 @@
             const examOptions = document.getElementById('examOptions');
             const examResult = document.getElementById('examResult');
             const examRepeatBtn = document.getElementById('examRepeatBtn');
-            const themePaletteHeader = document.getElementById('themePaletteHeader');
-            const colorDots = document.querySelectorAll('.color-dot');
+            const themePaletteTrigger = document.getElementById('themePaletteTrigger');
+            const themePaletteDropdown = document.getElementById('themePaletteDropdown');
+            const currentThemeDot = document.getElementById('currentThemeDot');
+            const celebrationOverlay = document.getElementById('celebrationOverlay');
+            const celebrationGif = document.getElementById('celebrationGif');
+            const celebrationClose = document.getElementById('celebrationClose');
 
             let currentMode = 'all';
             let randomItems = [];
             let currentAudio = null;
-            let isPlaying = false;
             let examQuestions = [];
             let examIndex = 0;
             let examScore = 0;
@@ -638,6 +731,12 @@
                     document.body.classList.add('light-mode');
                 }
                 localStorage.setItem('accentTheme', themeClass);
+                // Обновляем точку-триггер
+                const activeDot = document.querySelector(`.theme-palette-dropdown .color-dot[data-theme="${themeClass}"]`);
+                if (activeDot) {
+                    currentThemeDot.style.background = activeDot.style.background;
+                }
+                // Подсвечиваем активную тему в списке
                 document.querySelectorAll('.color-dot').forEach(dot => {
                     dot.classList.toggle('active', dot.dataset.theme === themeClass);
                 });
@@ -654,7 +753,8 @@
                 localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
             });
 
-            colorDots.forEach(dot => {
+            // Обработка кликов по кружкам темы (внутри dropdown)
+            document.querySelectorAll('.theme-palette-dropdown .color-dot').forEach(dot => {
                 dot.addEventListener('click', () => {
                     applyTheme(dot.dataset.theme);
                 });
@@ -668,7 +768,6 @@
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             });
 
-            // Прогресс
             function updateProgress() {
                 const total = syllables.length;
                 const marked = [...syllables].filter(s => learnedSet.has(s)).length;
@@ -677,7 +776,6 @@
                 progressFill.style.width = percent + '%';
             }
 
-            // Рендер
             function renderGrid() {
                 grid.innerHTML = '';
                 const items = currentMode === 'random' ? randomItems : syllables;
@@ -726,7 +824,6 @@
                 updateProgress();
             }
 
-            // Аудио
             function playAudio(syllable) {
                 if (currentAudio) {
                     currentAudio.pause();
@@ -790,7 +887,11 @@
             function showNextExamQuestion() {
                 if (examIndex >= examQuestions.length) {
                     examOverlay.classList.remove('show');
-                    showToast(`Экзамен завершён! Верно ${examScore} из ${examQuestions.length}`, 'success');
+                    if (examScore === 10) {
+                        showCelebration();
+                    } else {
+                        showToast(`Экзамен завершён! Верно ${examScore} из 10`, 'info');
+                    }
                     return;
                 }
                 const correct = examQuestions[examIndex];
@@ -819,22 +920,48 @@
                 if (selected === correct) {
                     btn.classList.add('correct');
                     examScore++;
+                    examResult.textContent = '👍';
                 } else {
                     btn.classList.add('wrong');
                     allOptions.forEach(opt => {
                         if (opt.textContent === correct.toUpperCase()) opt.classList.add('correct');
                     });
+                    examResult.textContent = '❌';
                 }
-                examResult.textContent = selected === correct ? 'Правильно!' : `Неверно! Правильно: ${correct}`;
                 setTimeout(() => {
                     examIndex++;
                     showNextExamQuestion();
                 }, 1500);
             }
-            // Кнопка повтора звука в экзамене
             examRepeatBtn.addEventListener('click', () => {
-                if (currentExamCorrect) {
-                    playAudio(currentExamCorrect);
+                if (currentExamCorrect) playAudio(currentExamCorrect);
+            });
+
+            // Праздник
+            const gifUrls = [
+                'https://media.gifs.ru/2158157ec6a1788936055b9e9911600c84c63e85_300.webp',
+                'https://media.gifs.ru/2771cc0c57b56e4c6cfa23d2d9d3f4eb1aab5aaa_300.webp',
+                'https://media.gifs.ru/2d609cd63a3ae5874298b500f9ab4b5871aabd16_300.webp',
+                'https://media.gifs.ru/3f25bc7fbec4825f63f6e619e0bd3c8819d80aa9_300.webp',
+                'https://media.gifs.ru/cbaddb0c4d7bea31ff48e153877a7cec628dcd22_300.webp',
+                'https://media.gifs.ru/a8e88e80cbecdfc6f34d261a843c82f8f6c2e42b_300.webp',
+                'https://media.gifs.ru/2640e63683ecae76864a3b8cc40cfe569bb188de_300.webp',
+                'https://media.gifs.ru/dea46c4e68cbe967d1044828093869737c0697391d7011fc3094a163248f53ff_300.webp',
+                'https://media.gifs.ru/e6eeccd12fe0d671a5e0f134daafcd7068cef5cf3c99affb72ca341eb9f43157_300.webp',
+                'https://media.gifs.ru/45256be700bbfc9f441b0ea62ed7069989ac7cda44f5ecdf2399deaf60954a58_300.webp',
+                'https://media.gifs.ru/f3e3b39148c45df671a433372b8b3cf4bdc997fa799bf8406d281ef593e97b10_300.webp'
+            ];
+            function showCelebration() {
+                const randomGif = gifUrls[Math.floor(Math.random() * gifUrls.length)];
+                celebrationGif.src = randomGif;
+                celebrationOverlay.classList.add('show');
+            }
+            celebrationClose.addEventListener('click', () => {
+                celebrationOverlay.classList.remove('show');
+            });
+            celebrationOverlay.addEventListener('click', (e) => {
+                if (e.target === celebrationOverlay) {
+                    celebrationOverlay.classList.remove('show');
                 }
             });
 
