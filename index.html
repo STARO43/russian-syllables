@@ -360,9 +360,9 @@
 
     <!-- Кнопки управления -->
     <div class="controls">
-        <button id="normalBtn" class="active" data-tooltip="Обычный режим">😱</button>
-        <button id="randomBtn" data-tooltip="Случайные 10">🎲</button>
-        <button id="hideLearnedBtn" data-tooltip="Скрыть отмеченные">✂</button>
+        <button id="normalBtn" class="active" data-tooltip="Всё">😱</button>
+        <button id="randomBtn" data-tooltip="Случайно">🎲</button>
+        <button id="hideLearnedBtn" data-tooltip="Убрать лишнее">✂</button>
     </div>
 
     <main class="grid-container">
@@ -469,7 +469,7 @@
 
                     const dot = document.createElement('div');
                     dot.className = 'learn-dot';
-                    dot.title = 'Отметить';
+                    dot.title = 'Минус';
                     dot.setAttribute('role', 'checkbox');
                     dot.setAttribute('aria-checked', learnedSet.has(syllable));
                     card.appendChild(dot);
