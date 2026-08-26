@@ -42,11 +42,7 @@
             --danger-glow: rgba(217, 56, 46, 0.15);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             background: var(--bg);
@@ -111,35 +107,30 @@
             font-weight: 500;
         }
 
-        /* Панель управления */
+        /* Новое меню */
         .controls {
-            max-width: 900px;
-            margin: 12px auto 0;
-            padding: 0 20px;
             display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            align-items: center;
             justify-content: center;
-        }
-        .control-group {
-            display: flex;
-            align-items: center;
             gap: 8px;
+            padding: 12px 20px;
+            flex-wrap: wrap;
         }
-        .controls select, .controls button {
+        .controls button {
             background: var(--bg-card);
             border: 1px solid var(--border);
             color: var(--text);
-            border-radius: 8px;
-            padding: 8px 12px;
-            font-family: var(--font);
-            font-size: 0.9rem;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
             cursor: pointer;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             transition: var(--transition);
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
-        .controls select:hover, .controls button:hover {
+        .controls button:hover {
             border-color: var(--accent);
             color: var(--accent);
             box-shadow: 0 0 10px var(--accent-glow);
@@ -148,9 +139,7 @@
             background: var(--accent-glow);
             border-color: var(--accent);
             color: var(--accent);
-        }
-        .hidden {
-            display: none !important;
+            box-shadow: 0 0 12px var(--accent-glow);
         }
 
         .grid-container {
@@ -302,41 +291,14 @@
         }
 
         @media (max-width: 900px) {
-            .syllable-grid {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 8px;
-            }
+            .syllable-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
         }
         @media (max-width: 600px) {
-            .syllable-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 5px;
-            }
-            .syllable-card {
-                font-size: 1rem;
-                padding: 12px 4px;
-                border-radius: 8px;
-                min-height: 50px;
-            }
-            .learn-dot {
-                width: 12px;
-                height: 12px;
-                bottom: 4px;
-                right: 4px;
-            }
-            .header {
-                padding: 24px 16px 12px;
-            }
-            .grid-container {
-                padding: 12px 12px 32px;
-            }
-            .controls {
-                gap: 6px;
-            }
-            .controls select, .controls button {
-                padding: 6px 8px;
-                font-size: 0.8rem;
-            }
+            .syllable-grid { grid-template-columns: repeat(2, 1fr); gap: 5px; }
+            .syllable-card { font-size: 1rem; padding: 12px 4px; min-height: 50px; }
+            .learn-dot { width: 12px; height: 12px; bottom: 4px; right: 4px; }
+            .controls { gap: 6px; }
+            .controls button { width: 38px; height: 38px; font-size: 1.1rem; }
         }
     </style>
 </head>
@@ -350,23 +312,12 @@
         <p>Жми, слушай, запоминай</p>
     </header>
 
-    <!-- Панель управления -->
+    <!-- Кнопки-иконки -->
     <div class="controls">
-        <div class="control-group">
-            <label for="sortMode">Сортировка:</label>
-            <select id="sortMode">
-                <option value="default" selected>По умолчанию</option>
-                <option value="vowels">От гласных</option>
-                <option value="random">10 случайных</option>
-            </select>
-        </div>
-        <div class="control-group">
-            <button id="randomRefresh" class="hidden" title="Заменить случайные">🔄 Заменить</button>
-        </div>
-        <div class="control-group">
-            <label for="hideLearned">Скрыть отмеченные</label>
-            <input type="checkbox" id="hideLearned">
-        </div>
+        <button class="mode-btn active" data-mode="default" title="Обычная сортировка">🔤</button>
+        <button class="mode-btn" data-mode="vowels" title="Сортировка от гласных">🗣️</button>
+        <button class="mode-btn" data-mode="random" title="10 случайных">🎲</button>
+        <button class="mode-btn" id="hideLearnedBtn" title="Скрыть изученные">🙈</button>
     </div>
 
     <main class="grid-container">
@@ -381,7 +332,7 @@
 
     <script>
         (function() {
-            // Исходный список элементов (после удаления указанных слогов)
+            // Исходный список элементов (без удалённых слогов)
             const rawItems = [
                 'ЁЖ', 'ёлка', 'ЁН', 'АБ', 'АВ', 'АГ', 'АД', 'АЖ', 'АЗ', 'АК', 'АЛ', 'Алла', 'АМ', 'АН', 'Анна', 'АП', 'арка', 'арфа', 'АС', 'АТ', 'АХ', 'АЧ', 'АШ',
                 'БА', 'БАК', 'БАЯН', 'БЕ', 'БИ', 'БО', 'БОК', 'БОР', 'Боря', 'БЫ', 'БЫК', 'БЭ', 'БЮ', 'БЯ',
@@ -419,11 +370,10 @@
                 'Катя', 'Коля', 'Лёва', 'Лёша', 'Лена', 'Люба', 'Люда', 'Миша', 'Нина', 'Петя',
                 'Рома', 'Саша', 'Тёма', 'Таня', 'Толя', 'Тома', 'Федя'
             ]);
-            const misc = new Set(['если', 'одна', 'игра', 'утро', 'юнга']); // остальные слова, не являющиеся именами и вещами
+            const misc = new Set(['если', 'одна', 'игра', 'утро', 'юнга']); // слова, не имена и не вещи
 
             const vowels = ['а', 'е', 'ё', 'и', 'о', 'у', 'ы', 'э', 'ю', 'я'];
 
-            // Получение гласной буквы для двухбуквенного слога
             function getVowel(syllable) {
                 if (syllable.length !== 2) return null;
                 const lower = syllable.toLowerCase();
@@ -431,10 +381,10 @@
                 const second = lower[1];
                 if (vowels.includes(first) && !vowels.includes(second)) return first;
                 if (!vowels.includes(first) && vowels.includes(second)) return second;
-                return null; // если обе гласные или обе согласные (не слог)
+                return null;
             }
 
-            // Сортировка "по умолчанию": длина, затем алфавит
+            // Сортировка по умолчанию (длина, затем алфавит)
             function sortDefault(arr) {
                 return arr.slice().sort((a, b) => {
                     const lenDiff = a.length - b.length;
@@ -443,127 +393,82 @@
                 });
             }
 
-            // Сортировка "от гласных": слоги по гласным, затем имена, вещи, остальное
+            // Сортировка от гласных
             function sortVowels(arr) {
-                const syllables = [];
-                const others = [];
+                const syllableGroups = {};
+                vowels.forEach(v => syllableGroups[v] = []);
+                const words = [];
+
                 arr.forEach(item => {
-                    if (item.length === 2 && getVowel(item)) {
-                        syllables.push(item);
+                    const vowel = getVowel(item);
+                    if (vowel) {
+                        syllableGroups[vowel].push(item);
                     } else {
-                        others.push(item);
+                        words.push(item);
                     }
                 });
 
-                // Группируем слоги по гласной
-                const groups = {};
-                vowels.forEach(v => groups[v] = []);
-                syllables.forEach(syl => {
-                    const v = getVowel(syl);
-                    if (v) groups[v].push(syl);
-                });
-
-                const sortedSyllables = [];
+                // Сортируем слоги внутри группы
                 vowels.forEach(v => {
-                    groups[v].sort((a, b) => a.localeCompare(b, 'ru', { sensitivity: 'base' }));
-                    sortedSyllables.push(...groups[v]);
+                    syllableGroups[v].sort((a, b) => a.localeCompare(b, 'ru', { sensitivity: 'base' }));
                 });
 
-                // Слова: имена, вещи, остальное
-                const namesArr = others.filter(w => names.has(w)).sort((a, b) => a.localeCompare(b, 'ru'));
-                const thingsArr = others.filter(w => !names.has(w) && !misc.has(w)).sort((a, b) => a.localeCompare(b, 'ru'));
-                const miscArr = others.filter(w => misc.has(w)).sort((a, b) => a.localeCompare(b, 'ru'));
+                // Разделяем слова на имена, вещи и остальное
+                const namesArr = words.filter(w => names.has(w)).sort((a, b) => a.localeCompare(b, 'ru'));
+                const miscArr = words.filter(w => misc.has(w)).sort((a, b) => a.localeCompare(b, 'ru'));
+                const thingsArr = words.filter(w => !names.has(w) && !misc.has(w)).sort((a, b) => a.localeCompare(b, 'ru'));
 
-                return [...sortedSyllables, ...namesArr, ...thingsArr, ...miscArr];
+                // Собираем результат
+                const result = [];
+                vowels.forEach(v => result.push(...syllableGroups[v]));
+                result.push(...namesArr, ...thingsArr, ...miscArr);
+                return result;
             }
 
-            // Функция для получения отображаемых элементов в зависимости от режима
-            function getDisplayedItems() {
-                const mode = sortModeSelect.value;
-                if (mode === 'random') {
-                    if (randomItems.length === 0) generateRandomItems();
-                    return randomItems;
-                } else if (mode === 'vowels') {
-                    return sortVowels(rawItems);
-                } else {
-                    return sortDefault(rawItems);
-                }
-            }
-
-            // Генерация 10 случайных элементов
-            function generateRandomItems() {
-                const shuffled = rawItems.slice().sort(() => Math.random() - 0.5);
-                randomItems = shuffled.slice(0, Math.min(10, shuffled.length));
-            }
-
-            // Элементы DOM
+            // Переменные состояния
+            let currentMode = 'default';
+            let randomItems = [];
             const grid = document.getElementById('syllableGrid');
             const toastContainer = document.getElementById('toastContainer');
             const themeToggle = document.getElementById('themeToggle');
-            const sortModeSelect = document.getElementById('sortMode');
-            const randomRefreshBtn = document.getElementById('randomRefresh');
-            const hideLearnedCheckbox = document.getElementById('hideLearned');
+            const modeButtons = document.querySelectorAll('.mode-btn');
+            const hideLearnedBtn = document.getElementById('hideLearnedBtn');
 
             let currentAudio = null;
-            let activeCardIndex = null;
             let isPlaying = false;
-            let randomItems = [];
 
-            // Изученные элементы храним как Set строк
+            // Изученные
             function loadLearnedSet() {
                 try {
-                    const data = localStorage.getItem('learned_syllables');
-                    return new Set(data ? JSON.parse(data) : []);
-                } catch (e) {
-                    return new Set();
-                }
+                    return new Set(JSON.parse(localStorage.getItem('learned_syllables') || '[]'));
+                } catch { return new Set(); }
             }
-
             function saveLearnedSet(set) {
-                try {
-                    localStorage.setItem('learned_syllables', JSON.stringify(Array.from(set)));
-                } catch (e) {
-                    console.warn('Не удалось сохранить отметки');
-                }
+                localStorage.setItem('learned_syllables', JSON.stringify(Array.from(set)));
             }
-
             let learnedSet = loadLearnedSet();
 
-            // Инициализация темы
-            if (localStorage.getItem('theme') === 'light') {
-                document.body.classList.add('light-mode');
-            }
+            // Тема
+            if (localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
             themeToggle.addEventListener('click', () => {
                 document.body.classList.toggle('light-mode');
                 localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
             });
 
-            // Переключение режима сортировки
-            sortModeSelect.addEventListener('change', () => {
-                if (sortModeSelect.value === 'random') {
-                    randomItems = [];
-                    randomRefreshBtn.classList.remove('hidden');
-                } else {
-                    randomRefreshBtn.classList.add('hidden');
-                }
-                renderGrid();
-            });
-
-            // Обновление случайных карточек
-            randomRefreshBtn.addEventListener('click', () => {
-                generateRandomItems();
-                renderGrid();
-            });
-
-            // Скрытие изученных
-            hideLearnedCheckbox.addEventListener('change', () => {
-                grid.classList.toggle('hide-learned', hideLearnedCheckbox.checked);
-            });
-
+            // Функция отображения
             function renderGrid() {
                 grid.innerHTML = '';
-                const items = getDisplayedItems();
-                items.forEach((syllable) => {
+                let items;
+                if (currentMode === 'random') {
+                    if (randomItems.length === 0) generateRandomItems();
+                    items = randomItems;
+                } else if (currentMode === 'vowels') {
+                    items = sortVowels(rawItems);
+                } else {
+                    items = sortDefault(rawItems);
+                }
+
+                items.forEach(syllable => {
                     const card = document.createElement('div');
                     card.className = 'syllable-card';
                     card.dataset.syllable = syllable;
@@ -583,9 +488,7 @@
                     dot.setAttribute('aria-checked', learnedSet.has(syllable));
                     card.appendChild(dot);
 
-                    if (learnedSet.has(syllable)) {
-                        card.classList.add('learned');
-                    }
+                    if (learnedSet.has(syllable)) card.classList.add('learned');
 
                     dot.addEventListener('click', (e) => {
                         e.stopPropagation();
@@ -602,7 +505,6 @@
 
                     grid.appendChild(card);
                 });
-                console.log(`🔤 Показано ${items.length} элементов`);
             }
 
             function toggleLearned(syllable, card) {
@@ -613,7 +515,7 @@
                 }
                 saveLearnedSet(learnedSet);
                 card.classList.toggle('learned', learnedSet.has(syllable));
-                // если скрытие включено, скрываем/показываем карточку автоматически (CSS)
+                // Если включено скрытие, карточка скроется автоматически (CSS)
             }
 
             function showToast(message, type = 'info') {
@@ -627,11 +529,8 @@
             }
 
             function clearPlayingState() {
-                document.querySelectorAll('.syllable-card').forEach(card => {
-                    card.classList.remove('playing');
-                });
+                document.querySelectorAll('.syllable-card.playing').forEach(c => c.classList.remove('playing'));
                 isPlaying = false;
-                activeCardIndex = null;
                 currentAudio = null;
             }
 
@@ -653,23 +552,15 @@
                 audio.volume = 1;
                 currentAudio = audio;
 
-                audio.addEventListener('ended', () => {
-                    clearPlayingState();
-                });
-
-                audio.addEventListener('error', (e) => {
-                    console.error('Ошибка загрузки аудио:', e);
+                audio.addEventListener('ended', clearPlayingState);
+                audio.addEventListener('error', () => {
                     clearPlayingState();
                     card.classList.add('error');
                     setTimeout(() => card.classList.remove('error'), 1000);
                     showToast('Не удалось загрузить аудио', 'error');
                 });
-
                 audio.play().catch(err => {
-                    if (err.name === 'AbortError') {
-                        console.log('Воспроизведение прервано');
-                    } else {
-                        console.error('Ошибка воспроизведения:', err);
+                    if (err.name !== 'AbortError') {
                         clearPlayingState();
                         card.classList.add('error');
                         setTimeout(() => card.classList.remove('error'), 1000);
@@ -677,6 +568,39 @@
                     }
                 });
             }
+
+            function generateRandomItems() {
+                const shuffled = rawItems.slice().sort(() => Math.random() - 0.5);
+                randomItems = shuffled.slice(0, Math.min(10, shuffled.length));
+            }
+
+            // Обработчики кнопок меню
+            modeButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const mode = btn.dataset.mode;
+                    if (btn.id === 'hideLearnedBtn') return; // обработаем отдельно
+                    if (mode === currentMode && mode !== 'random') return;
+                    if (mode === 'random') {
+                        if (currentMode !== 'random') {
+                            currentMode = 'random';
+                            randomItems = [];
+                        }
+                        generateRandomItems();
+                    } else {
+                        currentMode = mode;
+                    }
+                    // Обновляем активную кнопку
+                    modeButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    renderGrid();
+                });
+            });
+
+            // Кнопка скрытия изученных
+            hideLearnedBtn.addEventListener('click', () => {
+                hideLearnedBtn.classList.toggle('active');
+                grid.classList.toggle('hide-learned', hideLearnedBtn.classList.contains('active'));
+            });
 
             // Первоначальный рендер
             renderGrid();
