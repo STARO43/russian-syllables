@@ -492,17 +492,17 @@
             animation: fadeIn 0.3s ease;
         }
 
-        /* Кнопка "Далее" */
+        /* Кнопка "Далее" (теперь в шапке экзамена) */
         .exam-next-btn {
             display: none;
             background: var(--accent);
             color: white;
             border: none;
             border-radius: 50%;
-            width: 56px;
-            height: 56px;
+            width: 42px;
+            height: 42px;
             cursor: pointer;
-            font-size: 2rem;
+            font-size: 1.5rem;
             align-items: center;
             justify-content: center;
             transition: var(--transition);
@@ -705,10 +705,10 @@
         <div class="exam-header">
             <div class="exam-question" id="examQuestion"></div>
             <button class="exam-repeat-btn" id="examRepeatBtn" title="Повторить звук">🔊</button>
+            <button class="exam-next-btn" id="examNextBtn" title="Далее">→</button>
         </div>
         <div class="exam-options" id="examOptions"></div>
         <div class="exam-result" id="examResult"></div>
-        <button class="exam-next-btn" id="examNextBtn" title="Далее">→</button>
     </div>
 
     <!-- Окно с гифкой -->
@@ -959,6 +959,7 @@
             function startExam() {
                 examOverlay.classList.add('show');
                 examNextBtn.classList.remove('show');
+                examRepeatBtn.style.display = 'flex';
                 examQuestions = getRandomExamQuestions(10);
                 examIndex = 0;
                 examScore = 0;
@@ -982,7 +983,8 @@
                 currentExamCorrect = correct;
                 examQuestion.textContent = `Вопрос ${examIndex+1} из ${examQuestions.length}`;
                 examResult.textContent = '';
-                examNextBtn.classList.remove('show'); // скрываем кнопку до ответа
+                examNextBtn.classList.remove('show');
+                examRepeatBtn.style.display = 'flex';
                 const variants = new Set([correct]);
                 while (variants.size < 6) {
                     const randomItem = syllables[Math.floor(Math.random() * syllables.length)];
@@ -1013,28 +1015,25 @@
                     });
                     examResult.textContent = '❌';
                 }
-                // Показываем кнопку "Далее"
+                examRepeatBtn.style.display = 'none';
                 examNextBtn.classList.add('show');
                 examNextBtn.focus();
             }
-            // Обработчик кнопки "Далее"
             examNextBtn.addEventListener('click', () => {
                 examIndex++;
                 showNextExamQuestion();
             });
-            // Кнопка выхода
             examExitBtn.addEventListener('click', () => {
                 examOverlay.classList.remove('show');
-                // Останавливаем звук, если играет
                 if (currentAudio) {
                     currentAudio.pause();
                     currentAudio.src = '';
                     currentAudio = null;
                 }
                 examNextBtn.classList.remove('show');
+                examRepeatBtn.style.display = 'flex';
                 showToast('💔', 'info');
             });
-            // Повтор звука
             examRepeatBtn.addEventListener('click', () => {
                 if (currentExamCorrect) playAudio(currentExamCorrect);
             });
