@@ -119,30 +119,29 @@
         }
 
         /* Новая вертикальная палитра тем */
-        .palette-strip {
-            position: absolute;
-            top: 12px;
-            left: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-        .palette-strip .color-strip {
-            width: 10px;
-            height: 28px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            border: 1px solid transparent;
-        }
-        .palette-strip .color-strip:hover {
-            transform: scale(1.2);
-        }
-        .palette-strip .color-strip.active {
-            border-color: var(--text);
-            box-shadow: 0 0 8px var(--accent-glow);
-            transform: scale(1.1);
-        }
+       .palette-strip {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+.palette-strip .color-strip {
+    width: 24px;
+    height: 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid transparent;
+}
+.palette-strip .color-strip:hover {
+    transform: scale(1.2);
+}
+.palette-strip .color-strip.active {
+    border-color: var(--text);
+    box-shadow: 0 0 8px var(--accent-glow);
+    transform: scale(1.1);
+}
 
         .progress-container {
             max-width: 900px;
@@ -614,8 +613,8 @@
             .controls button { width: 38px; height: 38px; font-size: 1.1rem; }
             .theme-toggle { top: 6px; right: 10px; }
             .theme-toggle button { width: 32px; height: 32px; font-size: 1rem; }
-            .palette-strip { top: 6px; left: 10px; }
-            .palette-strip .color-strip { width: 8px; height: 22px; }
+            .palette-strip { gap: 5px; margin-bottom: 6px; }
+.palette-strip .color-strip { width: 18px; height: 10px; }
             .header { padding: 16px 12px 10px; }
         }
     </style>
